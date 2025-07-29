@@ -1,18 +1,21 @@
 # ui_components.py
-# Defines GUI components for PyLlamaUI using customtkinter
+# Defines GUI components for PyLlamaUI with live typing and Markdown support
 
 import tkinter as tk
-from tkinter import scrolledtext
 import customtkinter as ctk
+from tkinter import scrolledtext
+import markdown2
+import threading
+import time
 
 class ChatApp:
     def __init__(self, root, api):
-        """Initialize the chat application GUI."""
+        """Initialize the chat application GUI with Markdown support."""
         self.root = root
         self.api = api
         self.root.title("PyLlamaUI")
         self.root.geometry("600x400")
-        
+
         # Set customtkinter theme
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -35,14 +38,16 @@ class ChatApp:
         )
         self.model_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
 
-        # Chat display (scrollable text area)
+        # Chat display (scrollable text area with Markdown rendering)
         self.chat_display = scrolledtext.ScrolledText(
             self.main_frame,
             height=15,
             width=50,
             wrap=tk.WORD,
             state="disabled",
-            font=("Arial", 11)
+            font=("Arial", 11),
+            bg="#2b2b2b",
+            fg="#ffffff"
         )
         self.chat_display.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
 
@@ -66,26 +71,60 @@ class ChatApp:
         self.prompt_entry.bind("<Return>", lambda event: self.send_message())
 
     def send_message(self):
-        """Handle sending the prompt and displaying the response."""
+        """Handle sending the prompt and displaying the streamed response."""
         prompt = self.prompt_entry.get()
         if not prompt.strip():
             return
 
-        # Display user prompt
-        self._display_message(f"You: {prompt}\n")
-
-        # Get response from API
-        response = self.api.send_prompt(prompt)
-
-        # Display response
-        self._display_message(f"AI: {response}\n")
+        # Display user prompt (right-aligned)
+        user_message = f"**You**: {prompt}\n"
+        self._display_message(user_message, align="right")
 
         # Clear input
         self.prompt_entry.delete(0, tk.END)
 
-    def _display_message(self, message):
-        """Display a message in the chat window."""
+        # Disable input during streaming
+        self.prompt_entry.configure(state="disabled")
+        self.send_button.configure(state="disabled")
+
+        # Start streaming response in a separate thread
+        threading.Thread(target=self._stream_response, args=(prompt,), daemon=True).start()
+
+    def _stream_response(self, prompt):
+        """Stream and display the Ollama response with a typing effect."""
+        response_text = ""
+        self._display_message("**AI**: ", align="left")  # Start AI message
+
+        for chunk in self.api.send_prompt(prompt, stream=True):
+            response_text += chunk
+            self._display_message(chunk, align="left", append=True)
+            time.sleep(0.05)  # Simulate typing effect
+
+        # Finalize message with newline
+        self._display_message("\n", align="left", append=True)
+
+        # Re-enable input
+        self.root.after(0, lambda: self.prompt_entry.configure(state="normal"))
+        self.root.after(0, lambda: self.send_button.configure(state="normal"))
+
+    def _display_message(self, message, align="left", append=False):
+        """Display a message in the chat window with Markdown and alignment."""
         self.chat_display.configure(state="normal")
-        self.chat_display.insert(tk.END, message)
+        
+        if not append:
+            # Convert Markdown to HTML-like formatting for basic styling
+            html_message = markdown2.markdown(message, extras=["fenced-code-blocks"])
+            # Simplify to basic Tkinter text formatting
+            formatted_message = message  # Tkinter ScrolledText doesn't support full HTML
+            if align == "right":
+                formatted_message = " " * 20 + formatted_message  # Simple right-align hack
+        else:
+            formatted_message = message
+
+        if append:
+            self.chat_display.insert(tk.END, formatted_message)
+        else:
+            self.chat_display.insert(tk.END, formatted_message)
+        
         self.chat_display.see(tk.END)
         self.chat_display.configure(state="disabled")
