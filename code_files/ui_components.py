@@ -16,6 +16,10 @@ class ChatApp:
         self.root.title("PyLlamaUI")
         self.root.geometry("600x400")
 
+        # For streaming cancellation
+        self._stop_stream = threading.Event()
+        self._streaming = False
+
         # Set customtkinter theme
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -60,15 +64,22 @@ class ChatApp:
         self.prompt_entry.grid(row=2, column=0, sticky="ew", padx=5, pady=5)
 
         # Send button
+
         self.send_button = ctk.CTkButton(
             self.main_frame,
             text="Send",
-            command=self.send_message
+            command=self.send_or_stop
         )
         self.send_button.grid(row=3, column=0, sticky="e", padx=5, pady=5)
 
         # Bind Enter key to send message
-        self.prompt_entry.bind("<Return>", lambda event: self.send_message())
+        self.prompt_entry.bind("<Return>", lambda event: self.send_or_stop())
+
+    def send_or_stop(self):
+        if self._streaming:
+            self.stop_streaming()
+        else:
+            self.send_message()
 
     def send_message(self):
         """Handle sending the prompt and displaying the streamed response."""
@@ -83,29 +94,42 @@ class ChatApp:
         # Clear input
         self.prompt_entry.delete(0, tk.END)
 
-        # Disable input during streaming
+        # Prepare for streaming
         self.prompt_entry.configure(state="disabled")
-        self.send_button.configure(state="disabled")
+        self._stop_stream.clear()
+        self._streaming = True
+        self.send_button.configure(text="Stop", state="normal")
 
         # Start streaming response in a separate thread
         threading.Thread(target=self._stream_response, args=(prompt,), daemon=True).start()
 
+    def stop_streaming(self):
+        """Signal the streaming thread to stop."""
+        self._stop_stream.set()
+        self.send_button.configure(state="disabled")
+
     def _stream_response(self, prompt):
-        """Stream and display the Ollama response with a typing effect."""
+        """Stream and display the Ollama response with a typing effect. Supports cancellation."""
         response_text = ""
         self._display_message("PyLlamaUI: ", align="left")  # Start AI message
 
         for chunk in self.api.send_prompt(prompt, stream=True):
+            if self._stop_stream.is_set():
+                break
             response_text += chunk
             self._display_message(chunk, align="left", append=True)
             time.sleep(0.05)  # Simulate typing effect
 
-        # Finalize message with newline
-        self._display_message("\n", align="left", append=True)
+        # Finalize message with newline if not stopped
+        if not self._stop_stream.is_set():
+            self._display_message("\n", align="left", append=True)
 
-        # Re-enable input
-        self.root.after(0, lambda: self.prompt_entry.configure(state="normal"))
-        self.root.after(0, lambda: self.send_button.configure(state="normal"))
+        # Re-enable input and reset button
+        def reset():
+            self.prompt_entry.configure(state="normal")
+            self.send_button.configure(text="Send", state="normal")
+            self._streaming = False
+        self.root.after(0, reset)
 
     def _display_message(self, message, align="left", append=False):
         """Display a message in the chat window with Markdown and alignment."""
