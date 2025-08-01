@@ -77,7 +77,7 @@ class ChatApp:
             return
 
         # Display user prompt (right-aligned)
-        user_message = f"**You**: {prompt}\n"
+        user_message = f"You: {prompt}\n"
         self._display_message(user_message, align="right")
 
         # Clear input
@@ -93,7 +93,7 @@ class ChatApp:
     def _stream_response(self, prompt):
         """Stream and display the Ollama response with a typing effect."""
         response_text = ""
-        self._display_message("**AI**: ", align="left")  # Start AI message
+        self._display_message("PyLlamaUI: ", align="left")  # Start AI message
 
         for chunk in self.api.send_prompt(prompt, stream=True):
             response_text += chunk
