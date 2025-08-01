@@ -8,7 +8,7 @@ class OllamaAPI:
     def __init__(self, base_url="http://localhost:11434"):
         """Initialize the Ollama API client."""
         self.base_url = base_url
-        self.model = "deepseek-coder"  # Default model, can be changed later
+        self.model = "tinyllama"  # Default model, can be changed later
 
     def get_available_models(self):
         """Retrieve list of available models from Ollama."""
