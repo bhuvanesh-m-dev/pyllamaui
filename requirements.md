@@ -1,4 +1,4 @@
-PyLlamaUI Requirements
+PyLlamaUI Requirements  
 Below are the dependencies required for the PyLlamaUI project:
 
 
