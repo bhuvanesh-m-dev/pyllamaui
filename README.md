@@ -1,51 +1,42 @@
-# PyLlamaUI 🐍🦙  
-*A Python-based offline GUI for running AI models with Ollama*
+# PyllamaUI for VS Code 🧠🦙
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![License: MIT](https://img.shields.io/badge/License-MIT-green)
+A lightweight **offline AI assistant inside VS Code** powered by Python + Ollama.  
+Access local LLMs directly from your editor — no cloud, no telemetry, no internet required.
+
+![VS Code](https://img.shields.io/badge/Built%20for-VSCode-blue)
+![MIT License](https://img.shields.io/badge/License-MIT-green)
 ![Ollama](https://img.shields.io/badge/Powered%20by-Ollama-yellow)
-![Open Source](https://img.shields.io/badge/Open--Source-Yes-brightgreen)
+![Python](https://img.shields.io/badge/Backend-Python%203.10%2B-blue)
 
 ---
 
 ## 🌟 About
 
-**PyLlamaUI** is an open-source offline desktop application built with Python that lets you run and chat with large language models (LLMs) using [Ollama](https://ollama.com).
+**PyllamaUI (VS Code Edition)** is a [VS Code extension](https://marketplace.visualstudio.com/) that lets you chat with **locally hosted LLMs** using Python as the backend and [Ollama](https://ollama.com) as the model runner.
 
-No cloud. No tracking. Just pure local AI — fast and private.
-
----
-
-## 🚀 Features
-
-- 🖥️ Simple, clean GUI for chatting with LLMs
-- 🔌 Interacts with local Ollama server via REST API
-- 🔄 Load and switch between models (e.g., LLaMA 3, Mistral, etc.)
-- 💾 Save prompt history locally
-- ⚙️ Customizable settings: max tokens, temperature, system prompt
-- 🌓 Light/dark mode support *(optional)*
+It's fully offline, privacy-friendly, and designed for low-resource Linux systems.
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Features
 
+- 💬 Chat UI inside a VS Code panel
+- 🧠 Interact with local Ollama models (`llama3`, `mistral`, etc.)
+- 🐍 Python-powered backend (via `run_prompt.py`)
+- 🔌 Uses VS Code’s WebView for integrated GUI
+- 🚫 Works without internet – offline-first mindset
+- 📁 All user data processed locally
+
+---
+
+## 🛠️ Requirements
+
+### 💻 System
+- **VS Code 1.75+**
 - **Python 3.10+**
-- `customtkinter` (or `tkinter`) for GUI  
-- `requests` for Ollama API calls  
-- **Ollama** (installed locally and running in background)
 
----
+### 📦 Python Libraries
+Your backend should have the following installed (via `requirements.txt` or manually):
 
-## 📸 Screenshots
-
-> Coming soon...
-
----
-
-## 📦 Installation
-
-### 1. Prerequisites
-- 🐍 Python 3.10+
-- 🦙 [Ollama](https://ollama.com/download) installed and running locally  
 ```bash
-ollama run llama3
+pip install requests customtkinter markdown2
