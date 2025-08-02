@@ -34,3 +34,23 @@ It's fully offline, privacy-friendly, and designed for low-resource systems.
 ### 💻 System
 - **VS Code 1.75+**
 - **Python 3.10+**
+- **ollama**
+---  
+✅ **Model Recommendations**
+
+| Use Case        | Model Name       | Approx. Size | Description                                  |
+|-----------------|------------------|--------------|----------------------------------------------|
+| 📝 Text Chat    | `tinyllama`      | ~600 MB      | Lightweight text model                       |
+| 💻 Coding Help  | `deepseek-coder` | ~700 MB      | Designed for code generation                 |
+| ⚡ All-in-One    | `gemma:3b` (aka `gemma3n`) | ~5.5 GB  | Great for both chat & coding (Google DeepMind) |
+
+✅ **If unsure, just install `gemma3n` for the best all-around experience.**
+
+---
+
+To run a model:  
+`ollama run gemma3n`  
+`ollama run tinyllama`  
+`ollama run deepseek-coder`
+
+📌 *Special thanks to [Ollama](https://ollama.com) for making local LLMs accessible to all.*
