@@ -41,7 +41,7 @@
 
 We offer a pre-built `.exe` file for Windows users:
 
-👉 **[Download latest `.exe`](https://github.com/YOUR_USERNAME/YOUR_REPO/releases/latest)** from the Releases section.
+👉 **[Download latest `.exe`](https://github.com/bhuvanesh-m-dev/pyllamaui/releases/latest)** from the Releases section.
 
 > ⚠️ Make sure [Ollama](https://ollama.com/download) is installed and running on your system before launching the app.
 
