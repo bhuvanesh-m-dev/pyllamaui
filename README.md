@@ -1,10 +1,6 @@
 <p align="center">
   <img src="document/logo.png" alt="PyLlamaUI Logo" width="200">
-</p>
-
-# PyLlamaUI 🐍��
-
-*A Python-based offline GUI for running AI models with Ollama*
+</p>*A Python-based offline GUI for running AI models with Ollama*
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![License: MIT](https://img.shields.io/badge/License-MIT-green)
