@@ -1,0 +1,24 @@
+{
+  "name": "pyllamaui",
+  "displayName": "PyllamaUI",
+  "publisher": "bhuvanesh-m-dev",
+  "description": "Offline chat UI for Ollama via Python",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "activationEvents": [
+    "onCommand:pyllamaui.chat"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pyllamaui.chat",
+        "title": "Open PyllamaUI Chat"
+      }
+    ]
+  },
+  "scripts": {},
+  "devDependencies": {}
+}
