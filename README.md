@@ -53,4 +53,4 @@ To run a model:
 `ollama run tinyllama`  
 `ollama run deepseek-coder`
 
-📌 *Special thanks to [Ollama](https://ollama.com) for making local LLMs accessible to all.*
+📌 *Special thanks to [Ollama](https://ollama.com/download) for making local LLMs accessible to all.*
