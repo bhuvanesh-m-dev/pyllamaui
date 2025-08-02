@@ -34,9 +34,3 @@ It's fully offline, privacy-friendly, and designed for low-resource systems.
 ### 💻 System
 - **VS Code 1.75+**
 - **Python 3.10+**
-
-### 📦 Python Libraries
-Your backend should have the following installed (via `requirements.txt` or manually):
-
-```bash
-pip install requests customtkinter markdown2
