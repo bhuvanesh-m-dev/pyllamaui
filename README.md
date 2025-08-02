@@ -47,18 +47,6 @@ We offer a pre-built `.exe` file for Windows users:
 
 ---
 
-## 🐧 Linux & macOS
-
-Use the Python source directly or a `.deb` (coming soon):
-
-```bash
-git clone https://github.com/YOUR_USERNAME/pyllamaui.git
-cd pyllamaui
-pip install -r requirements.txt
-python main.py
-```
-
----
 
 ## 📸 Screenshots
 
