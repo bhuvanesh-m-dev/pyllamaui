@@ -1,4 +1,4 @@
-# PyLlamaUI 🐍��  
+# PyLlamaUI 🐍    
 <p align="center">
   <img src="document/logo.png" alt="PyLlamaUI Logo" width="200">
 </p>  
