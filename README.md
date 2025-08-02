@@ -1,7 +1,8 @@
-# PyLlamaUI 🐍    
 <p align="center">
-  <img src="document/logo.png" alt="PyLlamaUI Logo" width="500">
-</p>  
+  <img src="document/logo.png" alt="PyLlamaUI Logo" width="200">
+</p>
+
+# PyLlamaUI 🐍��
 
 *A Python-based offline GUI for running AI models with Ollama*
 
