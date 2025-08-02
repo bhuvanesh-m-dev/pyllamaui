@@ -14,7 +14,7 @@ Access local LLMs directly from your editor — no cloud, no telemetry, no inter
 
 **PyllamaUI (VS Code Edition)** is a [VS Code extension](https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui) that lets you chat with **locally hosted LLMs** using Python as the backend and [Ollama](https://ollama.com) as the model runner.
 
-It's fully offline, privacy-friendly, and designed for low-resource Linux systems.
+It's fully offline, privacy-friendly, and designed for low-resource systems.
 
 ---
 
