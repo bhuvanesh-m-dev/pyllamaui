@@ -1,0 +1,63 @@
+{
+  "name": "pyllamaui",
+  "displayName": "PyllamaUI",
+  "publisher": "bhuvanesh-m-dev",
+  "description": "Offline chat UI for Ollama via Python",
+  "version": "0.1.4",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "activationEvents": [
+    "onCommand:pyllamaui.chat"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pyllamaui.chat",
+        "title": "Open PyllamaUI Chat"
+      }
+    ],
+    "configuration": {
+      "title": "PyllamaUI",
+      "properties": {
+        "pyllamaui.theme": {
+          "type": "string",
+          "default": "dark",
+          "description": "The theme for the PyllamaUI chat window.",
+          "enum": [
+            "light",
+            "dark"
+          ]
+        },
+        "pyllamaui.modelName": {
+          "type": "string",
+          "default": "llama2",
+          "description": "The name of the Ollama model to use."
+        },
+        "pyllamaui.pythonPath": {
+          "type": "string",
+          "default": "python",
+          "description": "The path to the Python executable."
+        }
+      }
+    }
+  },
+  "scripts": {},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bhuvanesh-m/pyllamaui.git"
+  },
+  "files": [
+    "extension.js",
+    "webview/",
+    "py/",
+    "marked.min.js",
+    "webviewContent.js",
+    "activate.js",
+    "deactivate.js",
+    "LICENSE.txt",
+    "README.md"
+  ]
+}
