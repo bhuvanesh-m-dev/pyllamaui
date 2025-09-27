@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PyLlamaUI Markdown Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #181818; color: #fff; }
+        .test-area { border: 1px solid #333; padding: 20px; margin: 20px 0; background: #222; }
+        button { padding: 10px 20px; margin: 10px; background: #7c3aed; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        
+        /* Copy the same styles from webviewContent.js */
+        .bot h1, .bot h2, .bot h3, .bot h4, .bot h5, .bot h6 {
+            margin: 16px 0 8px 0;
+            color: #fff;
+        }
+        .bot p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .bot strong {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        .bot em {
+            font-style: italic;
+            color: #a78bfa;
+        }
+        .bot ul, .bot ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        .bot li {
+            margin: 4px 0;
+        }
+        .bot blockquote {
+            border-left: 4px solid #7c3aed;
+            margin: 16px 0;
+            padding: 8px 16px;
+            background: rgba(124, 58, 237, 0.1);
+            font-style: italic;
+        }
+        
+        /* Code block styling */
+        .bot pre {
+            position: relative;
+            background: #1e1e1e !important;
+            border: 1px solid #333;
+            border-radius: 8px;
+            margin: 16px 0;
+            overflow: hidden;
+        }
+        .bot code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .bot p code {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #fbbf24;
+        }
+        .code-header {
+            background: #2d2d2d;
+            padding: 8px 12px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            color: #888;
+        }
+        .copy-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: background 0.2s;
+        }
+        .copy-btn:hover {
+            background: #6d28d9;
+        }
+        .copy-btn.copied {
+            background: #10b981;
+        }
+        .bot pre code {
+            display: block;
+            padding: 16px;
+            overflow-x: auto;
+            background: transparent !important;
+            color: #f8f8f2;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <h1>PyLlamaUI Markdown Test</h1>
+    
+    <div class="test-area">
+        <h2>Test Markdown Content</h2>
+        <textarea id="markdownInput" rows="10" cols="80" style="width: 100%; background: #333; color: #fff; border: 1px solid #555; padding: 10px;">
+# Hello World
+
+This is a **bold text** and this is *italic text*.
+
+Here's a Python code example:
+
+```python
+def hello_world():
+    print("Hello, World!")
+    return "success"
+
+# This is a comment
+for i in range(5):
+    hello_world()
+```
+
+And here's some JavaScript:
+
+```javascript
+function greet(name) {
+    console.log(`Hello, ${name}!`);
+    return true;
+}
+
+greet("PyLlamaUI");
+```
+
+> This is a blockquote with some important information.
+
+- Item 1
+- Item 2
+- Item 3
+
+Inline code: `console.log("test")`
+        </textarea>
+        <br>
+        <button onclick="testMarkdown()">Test Markdown Rendering</button>
+    </div>
+    
+    <div class="test-area">
+        <h2>Rendered Output</h2>
+        <div id="output" class="bot"></div>
+    </div>
+
+    <script src="libs/marked.min.js"></script>
+    <script src="libs/prism.js"></script>
+    <script src="libs/prism-python.js"></script>
+    <script src="libs/prism-javascript.js"></script>
+    <script src="libs/prism-json.js"></script>
+    <script src="libs/prism-bash.js"></script>
+    
+    <script>
+        function renderMarkdown(element, text) {
+            if (typeof marked !== 'undefined') {
+                // Configure marked for better code block handling
+                marked.setOptions({
+                    highlight: function(code, lang) {
+                        if (typeof Prism !== 'undefined' && lang && Prism.languages[lang]) {
+                            return Prism.highlight(code, Prism.languages[lang], lang);
+                        }
+                        return code;
+                    },
+                    breaks: true,
+                    gfm: true
+                });
+                
+                const html = marked.parse(text);
+                element.innerHTML = html;
+                
+                // Add copy buttons to code blocks
+                addCopyButtons(element);
+            } else {
+                element.textContent = text;
+            }
+        }
+        
+        function addCopyButtons(container) {
+            const codeBlocks = container.querySelectorAll('pre code');
+            codeBlocks.forEach((codeBlock, index) => {
+                const pre = codeBlock.parentElement;
+                if (pre.querySelector('.code-header')) return; // Already has header
+                
+                const header = document.createElement('div');
+                header.className = 'code-header';
+                
+                const lang = codeBlock.className.match(/language-(\w+)/);
+                const langName = lang ? lang[1] : 'text';
+                
+                header.innerHTML = '<span>' + langName + '</span><button class="copy-btn" onclick="copyCode(this, ' + index + ')">Copy</button>';
+                
+                pre.insertBefore(header, codeBlock);
+                codeBlock.setAttribute('data-code-index', index);
+            });
+        }
+        
+        function copyCode(button, index) {
+            const codeBlock = document.querySelector('code[data-code-index="' + index + '"]');
+            if (codeBlock) {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy code:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = code;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('copied');
+                    }, 2000);
+                });
+            }
+        }
+        
+        function testMarkdown() {
+            const input = document.getElementById('markdownInput').value;
+            const output = document.getElementById('output');
+            renderMarkdown(output, input);
+        }
+        
+        // Test on page load
+        window.onload = function() {
+            testMarkdown();
+        };
+    </script>
+</body>
+</html>

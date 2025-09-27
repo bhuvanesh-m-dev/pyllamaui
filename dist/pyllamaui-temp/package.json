@@ -3,7 +3,7 @@
   "displayName": "PyllamaUI",
   "publisher": "bhuvanesh-m-dev",
   "description": "Offline chat UI for Ollama with Markdown support and code highlighting",
-  "version": "0.1.6",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.75.0"
   },
