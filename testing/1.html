@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLlamaUI - Run LLMs Offline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#3B82F6',
+                            600: '#2563EB',
+                        },
+                        space: {
+                            900: '#000000',
+                            800: 'rgba(0, 0, 0, 0.8)',
+                            700: 'rgba(10, 10, 20, 0.9)',
+                        }
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: #000;
+            position: relative;
+            overflow-x: hidden;
+        }
+        /* Space starry background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
+                radial-gradient(2px 2px at 160px 120px, #ddd, transparent),
+                radial-gradient(1px 1px at 200px 90px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1px 1px at 240px 160px, #fff, transparent),
+                radial-gradient(2px 2px at 280px 200px, rgba(255,255,255,0.7), transparent);
+            background-repeat: repeat;
+            background-size: 400px 300px;
+            animation: twinkling 4s ease-in-out infinite alternate;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.4), transparent),
+                radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1px 1px at 70% 10%, rgba(255,255,255,0.3), transparent),
+                radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.5), transparent);
+            background-repeat: repeat;
+            background-size: 100px 150px;
+            animation: drift-stars 50s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+        @keyframes twinkling {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        @keyframes drift-stars {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-20px); }
+        }
+        /* Glossy white translucent effect */
+        .glossy {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            border-radius: 1rem;
+        }
+        .glossy::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            border-radius: 1rem 1rem 0 0;
+        }
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .float-gentle {
+            animation: floatGentle 6s ease-in-out infinite;
+        }
+        @keyframes floatGentle {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .scroll-top {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        /* Navigation glossy */
+        nav {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* Section backgrounds translucent */
+        section {
+            background: transparent;
+        }
+        /* Buttons glossy enhancement */
+        button, a[href] {
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .bg-primary-500:hover {
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-space-900 text-gray-100 font-sans">
+    <!-- Navigation -->
+    <nav class="fixed w-full glossy z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i data-feather="cpu" class="text-primary-500 h-6 w-6"></i>
+                        <span class="ml-2 text-xl font-bold">PyLlamaUI</span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-4">
+                        <a href="#features" class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Features</a>
+                        <a href="#installation" class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Installation</a>
+                        <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="text-gray-400 hover:text-white transition">
+                            <i data-feather="github" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-white/10 focus:outline-none glossy">
+                        <i data-feather="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Features</a>
+                <a href="#installation" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Installation</a>
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 fade-in">Run LLMs Offline, <span class="text-primary-500">Your Way</span>.</h1>
+            <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 fade-in" style="animation-delay: 0.2s;">PyLlamaUI is a lightweight, privacy-focused desktop GUI for running Large Language Models locally on your machine. No internet required, no data collection.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="animation-delay: 0.4s;">
+                <a href="#installation" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg glossy">
+                    Download for <span id="os-text">your OS</span>
+                </a>
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="border border-white/20 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 glossy">
+                    View on GitHub
+                </a>
+            </div>
+            <div class="mt-16 fade-in" style="animation-delay: 0.6s;">
+                <img src="http://static.photos/technology/1024x576/42" alt="PyLlamaUI Interface" class="rounded-xl shadow-2xl border border-white/10 max-w-full mx-auto glossy">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">A Modern, Private, and Cross-Platform Experience</h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">Engineered for performance, privacy, and a great developer experience.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="lock" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Fully Offline & Private</h3>
+                    </div>
+                    <p class="text-gray-300">Your data, your models, your machine. No internet connection is needed after setup.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle" style="animation-delay: 0.2s;">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="monitor" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Truly Cross-Platform</h3>
+                    </div>
+                    <p class="text-gray-300">Linux-first development with full support for Windows. Use it on your favorite OS.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle" style="animation-delay: 0.4s;">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="code" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Modern Python Backend</h3>
+                    </div>
+                    <p class="text-gray-300">Built with Python 3.10+ and a simple REST API for robust performance.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle" style="animation-delay: 0.6s;">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="cpu" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Ollama Powered</h3>
+                    </div>
+                    <p class="text-gray-300">Natively supports model inference via Ollama, including models like TinyLLaMA, Gemma, and DeepSeek-Coder.</p>
+                </div>
+                <!-- Feature 5 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle" style="animation-delay: 0.8s;">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="git-merge" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Seamless Integration</h3>
+                    </div>
+                    <p class="text-gray-300">Integrates with VS Code via the Webview API for a native editor experience.</p>
+                </div>
+                <!-- Feature 6 -->
+                <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/20 float-gentle" style="animation-delay: 1s;">
+                    <div class="flex items-center mb-4">
+                        <div class="bg-primary-500/20 p-3 rounded-lg glossy">
+                            <i data-feather="zap" class="text-primary-500 h-6 w-6"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold ml-4">Lightweight & Fast</h3>
+                    </div>
+                    <p class="text-gray-300">Optimized for performance with minimal resource overhead, even on older hardware.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Installation Section -->
+    <section id="installation" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Get Started in Seconds</h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">Install PyLlamaUI on your favorite platform.</p>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="mb-8">
+                <div class="flex flex-wrap border-b border-white/10 glossy">
+                    <button class="tab-button px-4 py-2 font-medium text-sm md:text-base border-b-2 border-primary-500 text-primary-500" data-tab="windows">Windows</button>
+                    <button class="tab-button px-4 py-2 font-medium text-sm md:text-base border-b-2 border-transparent text-gray-400 hover:text-gray-300" data-tab="linux">Linux</button>
+                    <button class="tab-button px-4 py-2 font-medium text-sm md:text-base border-b-2 border-transparent text-gray-400 hover:text-gray-300" data-tab="pip">Pip</button>
+                    <button class="tab-button px-4 py-2 font-medium text-sm md:text-base border-b-2 border-transparent text-gray-400 hover:text-gray-300" data-tab="vscode">VS Code</button>
+                </div>
+            </div>
+            
+            <!-- Tab content -->
+            <div class="tab-content active" id="windows-tab">
+                <div class="glossy p-6 md:p-8 border-white/10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Windows Installer</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Download the .exe installer for a simple setup experience.</p>
+                        </div>
+                        <a href="#" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                            <i data-feather="download" class="h-5 w-5"></i>
+                            Download for Windows (.exe)
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="linux-tab">
+                <div class="glossy p-6 md:p-8 border-white/10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Linux Installer</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Download the .deb package for Debian, Ubuntu, and ZentoraOS.</p>
+                        </div>
+                        <a href="#" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                            <i data-feather="download" class="h-5 w-5"></i>
+                            Download for Linux (.deb)
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="pip-tab">
+                <div class="glossy p-6 md:p-8 border-white/10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">Install with Pip</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">For developers. Install directly from the Python Package Index.</p>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-4 font-mono text-sm overflow-x-auto glossy">
+                            <span class="text-gray-400">$ </span>pip install pyllamaui
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content hidden" id="vscode-tab">
+                <div class="glossy p-6 md:p-8 border-white/10">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-2">VS Code Extension</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Integrate PyLlamaUI directly into your editor.</p>
+                        </div>
+                        <a href="#" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                            <i data-feather="download" class="h-5 w-5"></i>
+                            Install from Marketplace
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="quick-start" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Simple Three-Step Setup</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center p-6 glossy rounded-xl border-white/10 fade-in">
+                    <div class="bg-primary-500/20 h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4 glossy">
+                        <span class="text-primary-500 text-2xl font-bold">1</span>
+                    </div>
+                    <div class="bg-primary-500/20 p-3 rounded-lg inline-flex mb-4 glossy">
+                        <i data-feather="download" class="text-primary-500 h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Install PyLlamaUI</h3>
+                    <p class="text-gray-300">Choose your platform and run the installer. No complex configuration required.</p>
+                </div>
+                <div class="text-center p-6 glossy rounded-xl border-white/10 fade-in" style="animation-delay: 0.2s;">
+                    <div class="bg-primary-500/20 h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4 glossy">
+                        <span class="text-primary-500 text-2xl font-bold">2</span>
+                    </div>
+                    <div class="bg-primary-500/20 p-3 rounded-lg inline-flex mb-4 glossy">
+                        <i data-feather="link" class="text-primary-500 h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Connect to Ollama</h3>
+                    <p class="text-gray-300">Ensure Ollama is running and pull your desired model (e.g., ollama run llama3).</p>
+                </div>
+                <div class="text-center p-6 glossy rounded-xl border-white/10 fade-in" style="animation-delay: 0.4s;">
+                    <div class="bg-primary-500/20 h-14 w-14 rounded-full flex items-center justify-center mx-auto mb-4 glossy">
+                        <span class="text-primary-500 text-2xl font-bold">3</span>
+                    </div>
+                    <div class="bg-primary-500/20 p-3 rounded-lg inline-flex mb-4 glossy">
+                        <i data-feather="message-square" class="text-primary-500 h-6 w-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Start Chatting</h3>
+                    <p class="text-gray-300">Launch PyLlamaUI, select your model, and begin your first offline conversation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section id="community" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Built for the Community</h2>
+            <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-10 fade-in" style="animation-delay: 0.2s;">PyLlamaUI is 100% free and open-source. We welcome contributions, bug reports, and feature requests. Help us build the best offline AI tool.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="animation-delay: 0.4s;">
+                <a href="https://github.com/bhuvaneshm/pyllamaui/issues" target="_blank" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
+                    <i data-feather="alert-circle" class="h-5 w-5"></i>
+                    Report an Issue
+                </a>
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="border border-white/20 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
+                    <i data-feather="github" class="h-5 w-5"></i>
+                    View Source on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="glossy py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div class="flex items-center">
+                    <i data-feather="cpu" class="text-primary-500 h-6 w-6"></i>
+                    <span class="ml-2 text-lg font-bold">PyLlamaUI</span>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="text-gray-400 hover:text-primary-500 transition">GitHub</a>
+                    <a href="https://bhuvaneshm.in" target="_blank" class="text-gray-400 hover:text-primary-500 transition">Your Portfolio</a>
+                    <a href="https://github.com/bhuvaneshm/pyllamaui/blob/main/LICENSE" target="_blank" class="text-gray-400 hover:text-primary-500 transition">License (MIT)</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/10">
+                <p class="text-gray-500 text-sm text-center">Developed with ❤️ by BHUVANESH M</p>
+                <p class="text-gray-500 text-sm text-center mt-2">© 2025 PyLlamaUI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scroll to top button -->
+    <button id="scroll-top" class="scroll-top fixed bottom-8 right-8 bg-primary-500 hover:bg-primary-600 text-white p-3 rounded-full shadow-lg hidden transition-all duration-300 glossy">
+        <i data-feather="arrow-up" class="h-5 w-5"></i>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Detect OS and update download button text
+        function detectOS() {
+            const userAgent = window.navigator.userAgent;
+            const platform = window.navigator.platform;
+            const osButton = document.getElementById('os-text');
+            
+            if (/Win/.test(platform)) {
+                osButton.textContent = 'Windows';
+            } else if (/Linux/.test(platform) || /Linux/.test(userAgent)) {
+                osButton.textContent = 'Linux';
+            } else if (/Mac/.test(platform)) {
+                osButton.textContent = 'macOS';
+            }
+        }
+        
+        detectOS();
+
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active classes from all buttons and contents
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('border-primary-500', 'text-primary-500');
+                    btn.classList.add('border-transparent', 'text-gray-400');
+                });
+                tabContents.forEach(content => content.classList.add('hidden'));
+                
+                // Add active classes to clicked button and corresponding content
+                button.classList.remove('border-transparent', 'text-gray-400');
+                button.classList.add('border-primary-500', 'text-primary-500');
+                
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+            });
+        });
+
+        // Scroll to top button
+        const scrollTopButton = document.getElementById('scroll-top');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopButton.classList.remove('hidden');
+                scrollTopButton.classList.add('block');
+            } else {
+                scrollTopButton.classList.remove('block');
+                scrollTopButton.classList.add('hidden');
+            }
+        });
+        
+        scrollTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const fadeInElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        
+        fadeInElements.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(30px) scale(0.95)';
+            element.style.transition = 'opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            observer.observe(element);
+        });
+
+        // Feather icons
+        feather.replace();
+    </script>
+</body>
+</html>
