@@ -29,11 +29,10 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-space-900 text-gray-100 font-sans">
     <!-- Navigation -->
@@ -50,7 +49,7 @@
                     <div class="ml-10 flex items-center space-x-4">
                         <a href="#features" class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Features</a>
                         <a href="#installation" class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Installation</a>
-                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="text-gray-400 hover:text-white transition">
+                        <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="text-gray-400 hover:text-white transition">
                             <i data-feather="github" class="h-5 w-5"></i>
                         </a>
                     </div>
@@ -67,7 +66,7 @@
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Features</a>
                 <a href="#installation" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Installation</a>
-                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">GitHub</a>
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">GitHub</a>
             </div>
         </div>
     </nav>
@@ -79,24 +78,14 @@
             <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 fade-in" style="animation-delay: 0.2s;">PyLlamaUI is a lightweight, privacy-focused desktop GUI for running Large Language Models locally on your machine. No internet required, no data collection.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="animation-delay: 0.4s;">
                 <a href="#installation" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg glossy">
-                    Download Now</span>
+                    Download for <span id="os-text">your OS</span>
                 </a>
-                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 glossy">
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 glossy">
                     View on GitHub
                 </a>
             </div>
             <div class="mt-16 fade-in" style="animation-delay: 0.6s;">
-                <div class="max-w-4xl mx-auto">
-                    <iframe 
-                        class="w-full aspect-video rounded-xl shadow-2xl border border-white/5 glossy"
-                        src="https://www.youtube.com/embed/mTqb-VupE8A?si=YSWncHTh0BHB0mgW" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        referrerpolicy="strict-origin-when-cross-origin" 
-                        allowfullscreen>
-                    </iframe>
-                </div>
+                <img src="http://static.photos/technology/1024x576/42" alt="PyLlamaUI Interface" class="rounded-xl shadow-2xl border border-white/5 max-w-full mx-auto glossy">
             </div>
         </div>
     </section>
@@ -109,7 +98,6 @@
                 <p class="text-lg text-gray-300 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">Engineered for performance, privacy, and a great developer experience.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -119,7 +107,6 @@
                     </div>
                     <p class="text-gray-300">Your data, your models, your machine. No internet connection is needed after setup.</p>
                 </div>
-                <!-- Feature 2 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle" style="animation-delay: 0.2s;">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -127,9 +114,8 @@
                         </div>
                         <h3 class="text-xl font-semibold ml-4">Truly Cross-Platform</h3>
                     </div>
-                    <p class="text-gray-300">Use it on your favorite Environment.</p>
+                    <p class="text-gray-300">Linux-first development with full support for Windows. Use it on your favorite OS.</p>
                 </div>
-                <!-- Feature 3 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle" style="animation-delay: 0.4s;">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -139,7 +125,6 @@
                     </div>
                     <p class="text-gray-300">Built with Python 3.10+ and a simple REST API for robust performance.</p>
                 </div>
-                <!-- Feature 4 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle" style="animation-delay: 0.6s;">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -147,9 +132,8 @@
                         </div>
                         <h3 class="text-xl font-semibold ml-4">Ollama Powered</h3>
                     </div>
-                    <p class="text-gray-300">Natively supports model inference via Ollama, including models like TinyLLaMA, Gemma, DeepSeek-Coder, etc.</p>
+                    <p class="text-gray-300">Natively supports model inference via Ollama, including models like TinyLLaMA, Gemma, and DeepSeek-Coder.</p>
                 </div>
-                <!-- Feature 5 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle" style="animation-delay: 0.8s;">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -157,9 +141,8 @@
                         </div>
                         <h3 class="text-xl font-semibold ml-4">Seamless Integration</h3>
                     </div>
-                    <p class="text-gray-300">Integrates with VS Code!</p>
+                    <p class="text-gray-300">Integrates with VS Code via the Webview API for a native editor experience.</p>
                 </div>
-                <!-- Feature 6 -->
                 <div class="feature-card glossy p-6 transition duration-300 ease-in-out hover:border-primary-500 border-white/10 float-gentle" style="animation-delay: 1s;">
                     <div class="flex items-center mb-4">
                         <div class="bg-primary-500/10 p-3 rounded-lg glossy">
@@ -181,7 +164,6 @@
                 <p class="text-lg text-gray-300 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">Install PyLlamaUI on your favorite platform.</p>
             </div>
             
-            <!-- Tabs -->
             <div class="mb-8">
                 <div class="flex flex-wrap border-b glossy">
                     <button class="tab-button px-4 py-2 font-medium text-sm md:text-base border-b-2 border-primary-500 text-primary-500" data-tab="windows">Windows</button>
@@ -191,7 +173,6 @@
                 </div>
             </div>
             
-            <!-- Tab content -->
             <div class="tab-content active" id="windows-tab">
                 <div class="glossy p-6 md:p-8 border-white/5">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
@@ -300,11 +281,11 @@
             <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Built for the Community</h2>
             <p class="text-lg text-gray-300 max-w-3xl mx-auto mb-10 fade-in" style="animation-delay: 0.2s;">PyLlamaUI is 100% free and open-source. We welcome contributions, bug reports, and feature requests. Help us build the best offline AI tool.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="animation-delay: 0.4s;">
-                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/issues" target="_blank" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
+                <a href="https://github.com/bhuvaneshm/pyllamaui/issues" target="_blank" class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
                     <i data-feather="alert-circle" class="h-5 w-5"></i>
-                    Report an Issue 
+                    Report an Issue
                 </a>
-                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
+                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
                     <i data-feather="github" class="h-5 w-5"></i>
                     View Source on GitHub
                 </a>
@@ -321,9 +302,9 @@
                     <span class="ml-2 text-lg font-bold">PyLlamaUI</span>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-6">
-                    <a href="https://github.com/bhuvanesh-m-dev" target="_blank" class="text-gray-400 hover:text-primary-500 transition">GitHub</a>
-                    <a href="https://bhuvaneshm.in" target="_blank" class="text-gray-400 hover:text-primary-500 transition">Portfolio</a>
-                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/blob/main/LICENSE" target="_blank" class="text-gray-400 hover:text-primary-500 transition">License (MIT)</a>
+                    <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank" class="text-gray-400 hover:text-primary-500 transition">GitHub</a>
+                    <a href="https://bhuvaneshm.in" target="_blank" class="text-gray-400 hover:text-primary-500 transition">Your Portfolio</a>
+                    <a href="https://github.com/bhuvaneshm/pyllamaui/blob/main/LICENSE" target="_blank" class="text-gray-400 hover:text-primary-500 transition">License (MIT)</a>
                 </div>
             </div>
             <div class="mt-8 pt-8 border-t border-white/5">
