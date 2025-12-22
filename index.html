@@ -187,11 +187,15 @@
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* Navigation more translucent */
+        /* Navigation and Footer more transparent with glossy effect */
+        nav,
+        footer {
+            background: rgba(0, 0, 0, 0.1) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+        }
+
         nav {
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -235,7 +239,7 @@
                             class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Features</a>
                         <a href="#installation"
                             class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Installation</a>
-                        <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank"
+                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
                             class="text-gray-400 hover:text-white transition">
                             <i data-feather="github" class="h-5 w-5"></i>
                         </a>
@@ -256,7 +260,7 @@
                     class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Features</a>
                 <a href="#installation"
                     class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Installation</a>
-                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank"
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
                     class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">GitHub</a>
             </div>
         </div>
@@ -275,7 +279,7 @@
                     class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 shadow-lg glossy">
                     Download for <span id="os-text">your OS</span>
                 </a>
-                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank"
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
                     class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 glossy">
                     View on GitHub
                 </a>
@@ -408,7 +412,7 @@
                             <p class="text-gray-300 mb-4 md:mb-0">Download the .exe installer for a simple setup
                                 experience.</p>
                         </div>
-                        <a href="#"
+                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/download/windows-exe-v0.1/pyllamaui.exe"
                             class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
                             <i data-feather="download" class="h-5 w-5"></i>
                             Download for Windows (.exe)
@@ -456,7 +460,7 @@
                             <h3 class="text-xl font-semibold mb-2">VS Code Extension</h3>
                             <p class="text-gray-300 mb-4 md:mb-0">Integrate PyLlamaUI directly into your editor.</p>
                         </div>
-                        <a href="#"
+                        <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui"
                             class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
                             <i data-feather="download" class="h-5 w-5"></i>
                             Install from Marketplace
@@ -522,12 +526,12 @@
                 100% free and open-source. We welcome contributions, bug reports, and feature requests. Help us build
                 the best offline AI tool.</p>
             <div class="flex flex-col sm:flex-row justify-center gap-4 fade-in" style="animation-delay: 0.4s;">
-                <a href="https://github.com/bhuvaneshm/pyllamaui/issues" target="_blank"
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/issues" target="_blank"
                     class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
                     <i data-feather="alert-circle" class="h-5 w-5"></i>
                     Report an Issue
                 </a>
-                <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank"
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
                     class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 glossy">
                     <i data-feather="github" class="h-5 w-5"></i>
                     View Source on GitHub
@@ -549,7 +553,7 @@
                         class="text-gray-400 hover:text-primary-500 transition">GitHub</a>
                     <a href="https://bhuvaneshm.in" target="_blank"
                         class="text-gray-400 hover:text-primary-500 transition">Portfolio</a>
-                    <a href="https://github.com/bhuvaneshm/pyllamaui/blob/main/LICENSE" target="_blank"
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/blob/main/LICENSE" target="_blank"
                         class="text-gray-400 hover:text-primary-500 transition">License (MIT)</a>
                 </div>
             </div>
