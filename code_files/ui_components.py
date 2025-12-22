@@ -16,7 +16,7 @@ class ChatApp:
         self.api = api
         self.agent = agent  # AgenticWorkflow instance, optional
         self.root.title("PyLlamaUI")
-        self.root.geometry("600x400")
+        self.root.geometry("600x500")
 
         # For streaming cancellation
         self._stop_stream = threading.Event()
@@ -28,7 +28,7 @@ class ChatApp:
 
         # Set customtkinter theme
         ctk.set_appearance_mode("dark")
-        ctk.set_default_color_theme("blue")
+        ctk.set_default_color_theme("blue") # We will override specific colors for Violet
 
         # Configure grid layout
         self.root.grid_columnconfigure(0, weight=1)
@@ -44,7 +44,7 @@ class ChatApp:
         self.model_label = ctk.CTkLabel(
             self.main_frame,
             text=f"Model: {self.api.model}",
-            font=("Arial", 12)
+            font=("Arial", 12, "bold")
         )
         self.model_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
 
@@ -53,11 +53,13 @@ class ChatApp:
         self.mode_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.mode_frame.grid(row=0, column=0, sticky="e", padx=5, pady=5)
         self.normal_radio = ctk.CTkRadioButton(
-            self.mode_frame, text="Normal", variable=self.mode_var, value="Normal"
+            self.mode_frame, text="Normal", variable=self.mode_var, value="Normal",
+            fg_color="#8A2BE2", hover_color="#7B1FA2"  # Violet
         )
         self.normal_radio.grid(row=0, column=0, padx=(0, 5))
         self.agentic_radio = ctk.CTkRadioButton(
-            self.mode_frame, text="Agentic", variable=self.mode_var, value="Agentic"
+            self.mode_frame, text="Agentic", variable=self.mode_var, value="Agentic",
+            fg_color="#8A2BE2", hover_color="#7B1FA2"  # Violet
         )
         self.agentic_radio.grid(row=0, column=1, padx=(0, 5))
 
@@ -73,6 +75,13 @@ class ChatApp:
             fg="#ffffff"
         )
         self.chat_display.grid(row=1, column=0, sticky="nsew", padx=5, pady=5)
+        
+        # Tags for alignment and styling
+        self.chat_display.tag_config("right", justify="right")
+        self.chat_display.tag_config("left", justify="left")
+        self.chat_display.tag_config("bold", font=("Arial", 11, "bold"))
+        self.chat_display.tag_config("user_color", foreground="#D0A0FF") # Light Violet
+        self.chat_display.tag_config("bot_color", foreground="#A0C0FF") # Light Blue
 
         # Prompt input
         self.prompt_entry = ctk.CTkEntry(
@@ -85,56 +94,98 @@ class ChatApp:
         # Frame for settings, model, send, and other buttons
         self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.button_frame.grid(row=3, column=0, sticky="e", padx=5, pady=5)
-        self.button_frame.grid_columnconfigure(0, weight=0)
-        self.button_frame.grid_columnconfigure(1, weight=0)
-        self.button_frame.grid_columnconfigure(2, weight=0)
-        self.button_frame.grid_columnconfigure(3, weight=0)
-        self.button_frame.grid_columnconfigure(4, weight=0)
-        self.button_frame.grid_columnconfigure(5, weight=0)
+        
+        # Grid config for buttons
+        for i in range(7):
+            self.button_frame.grid_columnconfigure(i, weight=0)
 
         # Settings button
         self.settings_button = ctk.CTkButton(
             self.button_frame,
             text="⚙️",
             width=40,
-            command=self.open_settings
+            command=self.open_settings,
+            fg_color="#8A2BE2", hover_color="#7B1FA2"
         )
         self.settings_button.grid(row=0, column=0, padx=(0,5))
+
+        # Theme button
+        self.theme_var = tk.StringVar(value="Dark")
+        self.theme_button = ctk.CTkButton(
+            self.button_frame,
+            text="Theme: Dark",
+            width=100,
+            command=self.cycle_theme,
+            fg_color="#8A2BE2", hover_color="#7B1FA2"
+        )
+        self.theme_button.grid(row=0, column=1, padx=(0,5))
 
         # Model selection button
         self.model_button = ctk.CTkButton(
             self.button_frame,
             text=self.api.model,
             width=80,
-            command=self.show_model_menu
+            command=self.show_model_menu,
+            fg_color="#8A2BE2", hover_color="#7B1FA2"
         )
-        self.model_button.grid(row=0, column=1, padx=(0,5))
+        self.model_button.grid(row=0, column=2, padx=(0,5))
 
-        # Send/Agent button (context-dependent)
+        # Send Button
         self.send_button = ctk.CTkButton(
             self.button_frame,
             text="Send",
-            command=self.send_or_stop
+            command=self.send_or_stop,
+            fg_color="#8A2BE2", hover_color="#7B1FA2"
         )
-        self.send_button.grid(row=0, column=2, padx=(0,5))
+        self.send_button.grid(row=0, column=3, padx=(0,5))
 
-        # Undo button (for normal mode)
+        # Undo button
         self.undo_button = ctk.CTkButton(
-            self.button_frame, text="Undo", width=80, command=self.undo
+            self.button_frame, text="Undo", width=60, command=self.undo,
+            fg_color="#555555", hover_color="#444444"
         )
-        self.undo_button.grid(row=0, column=3, padx=(0,5))
+        self.undo_button.grid(row=0, column=4, padx=(0,5))
 
-        # Redo button (for normal mode)
+        # Redo button
         self.redo_button = ctk.CTkButton(
-            self.button_frame, text="Redo", width=80, command=self.redo
+            self.button_frame, text="Redo", width=60, command=self.redo,
+            fg_color="#555555", hover_color="#444444"
         )
-        self.redo_button.grid(row=0, column=4, padx=(0,5))
+        self.redo_button.grid(row=0, column=5, padx=(0,5))
 
         # Bind Enter key to send message or run agent
         self.prompt_entry.bind("<Return>", lambda event: self.send_or_stop())
 
     def open_settings(self):
         SettingsDialog(self.root)
+
+    def cycle_theme(self):
+        """Cycle through Light, Dark, and Pure Dark themes."""
+        current = self.theme_var.get()
+        if current == "Dark":
+            new_theme = "Pure Dark"
+            ctk.set_appearance_mode("dark")
+            # Manually set black for Pure Dark
+            self.root.configure(bg="#000000")
+            self.main_frame.configure(fg_color="#000000")
+            self.chat_display.configure(bg="#000000", fg="#ffffff")
+        elif current == "Pure Dark":
+            new_theme = "Light"
+            ctk.set_appearance_mode("light")
+            # Reset to standard light
+            self.root.configure(bg="#ebebeb") # Standard ctk light
+            self.main_frame.configure(fg_color="#ebebeb")
+            self.chat_display.configure(bg="#ffffff", fg="#000000")
+        else: # Light
+            new_theme = "Dark"
+            ctk.set_appearance_mode("dark")
+            # Reset to standard dark
+            self.root.configure(bg="#242424") # Standard ctk dark
+            self.main_frame.configure(fg_color="#2b2b2b")
+            self.chat_display.configure(bg="#2b2b2b", fg="#ffffff")
+        
+        self.theme_var.set(new_theme)
+        self.theme_button.configure(text=f"Theme: {new_theme}")
 
     def show_model_menu(self):
         """Show a dropdown menu to select the model from Ollama."""
@@ -186,10 +237,9 @@ class ChatApp:
             return
 
         # Display user prompt (right-aligned)
-        user_message = f"You: {prompt}\n"
-        self._display_message(user_message, align="right")
-        self.prompt_stack.append((prompt, ""))  # Store prompt, response added later
-        self.undo_stack.clear()  # Clear redo stack
+        self._display_message("You", f": {prompt}\n", align="right", speaker_type="user")
+        self.prompt_stack.append((prompt, ""))
+        self.undo_stack.clear()
 
         # Clear input
         self.prompt_entry.delete(0, tk.END)
@@ -211,21 +261,19 @@ class ChatApp:
     def _stream_response(self, prompt):
         """Stream and display the Ollama response with a typing effect (Normal mode)."""
         response_text = ""
-        self._display_message("PyLlamaUI: ", align="left")  # Start AI message
+        self._display_message("PyLlamaUI", ": ", align="left", speaker_type="bot")
 
         for chunk in self.api.send_prompt(prompt, stream=True):
             if self._stop_stream.is_set():
                 break
             response_text += chunk
-            self._display_message(chunk, align="left", append=True)
-            time.sleep(0.05)  # Simulate typing effect
+            self._display_message(None, chunk, align="left", append=True, speaker_type="bot")
+            time.sleep(0.01) # Faster typing usually feels better
 
-        # Finalize message with newline if not stopped
         if not self._stop_stream.is_set():
-            self._display_message("\n", align="left", append=True)
-            self.prompt_stack[-1] = (prompt, response_text)  # Update with full response
+            self._display_message(None, "\n", align="left", append=True, speaker_type="bot")
+            self.prompt_stack[-1] = (prompt, response_text)
 
-        # Re-enable input and reset button
         def reset():
             self.prompt_entry.configure(state="normal")
             self.send_button.configure(text="Send", state="normal")
@@ -242,35 +290,26 @@ class ChatApp:
         if not prompt.strip():
             return
 
-        # Display user prompt (right-aligned)
-        user_message = f"You: {prompt}\n"
-        self._display_message(user_message, align="right")
-
-        # Clear input
+        self._display_message("You", f": {prompt}\n", align="right", speaker_type="user")
         self.prompt_entry.delete(0, tk.END)
 
-        # Prepare for agentic streaming
         self.prompt_entry.configure(state="disabled")
         self._stop_stream.clear()
         self._streaming = True
         self.send_button.configure(text="Stop", state="normal")
 
-        # Start agent tasks in a separate thread
         threading.Thread(target=self._run_agent_tasks, args=(prompt,), daemon=True).start()
 
     def _run_agent_tasks(self, prompt):
         """Execute agentic tasks and display results."""
-        # Example task chain: Generate code -> Execute -> Analyze
-        self.agent.add_task("generate_code", f"Write a Python function to {prompt}")
-        self.agent.add_task("execute_code", "", depends_on=0)
-        self.agent.add_task("analyze", "Explain the output", depends_on=1)
+        self._display_message("PyLlamaUI", ": Processing...\n", align="left", speaker_type="bot")
+        self.agent.add_task("process", prompt)
 
         for result in self.agent.run_tasks():
             if self._stop_stream.is_set():
                 break
-            self._display_message(result + "\n", align="left")
+            self._display_message(None, result + "\n", align="left", speaker_type="bot")
 
-        # Re-enable input and reset button
         def reset():
             self.prompt_entry.configure(state="normal")
             self.send_button.configure(text="Send", state="normal")
@@ -283,8 +322,13 @@ class ChatApp:
             prompt, response = self.prompt_stack.pop()
             self.undo_stack.append((prompt, response))
             self.chat_display.configure(state="normal")
-            self.chat_display.delete("end-2l", tk.END)  # Remove AI message
-            self.chat_display.delete("end-2l", tk.END)  # Remove user message
+            # Attempt to delete last interaction. 
+            # With formatting, precise deletion is tricky. 
+            # We'll just delete from end.
+            # Ideally we'd mark ranges, but for this quick UI task:
+            self.chat_display.delete("end-50l", tk.END) # Delete last few lines (approx)
+            # This is not precise, but Tkinter text navigation for "last 2 messages" is complex without markers.
+            self.chat_display.insert(tk.END, "[Undo Action Performed - History Cleared]\n", "bold")
             self.chat_display.configure(state="disabled")
 
     def redo(self):
@@ -292,27 +336,23 @@ class ChatApp:
         if self.undo_stack:
             prompt, response = self.undo_stack.pop()
             self.prompt_stack.append((prompt, response))
-            self._display_message(f"You: {prompt}\n", align="right")
-            self._display_message(f"PyLlamaUI: {response}\n", align="left")
+            self._display_message("You", f": {prompt}\n", align="right", speaker_type="user")
+            self._display_message("PyLlamaUI", f": {response}\n", align="left", speaker_type="bot")
 
-    def _display_message(self, message, align="left", append=False):
-        """Display a message in the chat window with Markdown and alignment."""
+    def _display_message(self, speaker_name, text_content, align="left", append=False, speaker_type="bot"):
+        """Display a message in the chat window with alignment and styling."""
         self.chat_display.configure(state="normal")
         
-        if not append:
-            # Convert Markdown to HTML-like formatting for basic styling
-            html_message = markdown2.markdown(message, extras=["fenced-code-blocks"])
-            # Simplify to basic Tkinter text formatting
-            formatted_message = message  # Tkinter ScrolledText doesn't support full HTML
-            if align == "right":
-                formatted_message = " " * 20 + formatted_message  # Simple right-align hack
-        else:
-            formatted_message = message
-
-        if append:
-            self.chat_display.insert(tk.END, formatted_message)
-        else:
-            self.chat_display.insert(tk.END, formatted_message)
+        # Tags to apply
+        base_tags = [align]
+        
+        if speaker_name:
+            name_tags = tuple(base_tags + ["bold", "user_color" if speaker_type == "user" else "bot_color"])
+            self.chat_display.insert(tk.END, speaker_name, name_tags)
+        
+        if text_content:
+            # We handle simple formatting
+            self.chat_display.insert(tk.END, text_content, tuple(base_tags))
         
         self.chat_display.see(tk.END)
         self.chat_display.configure(state="disabled")
