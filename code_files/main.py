@@ -4,7 +4,6 @@
 import tkinter as tk
 from ui_components import ChatApp
 from api import OllamaAPI
-from agentic import AgenticWorkflow
 
 def main():
     # Initialize the main Tkinter window
@@ -13,11 +12,8 @@ def main():
     # Create Ollama API instance
     api = OllamaAPI(base_url="http://localhost:11434")
     
-    # Create agentic workflow instance
-    agent = AgenticWorkflow(api)
-    
-    # Create and start the chat application with agent support
-    app = ChatApp(root, api, agent)
+    # Create and start the chat application
+    app = ChatApp(root, api)
     
     # Start the Tkinter event loop
     root.mainloop()
