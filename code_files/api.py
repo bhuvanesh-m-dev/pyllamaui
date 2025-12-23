@@ -39,4 +39,3 @@ class OllamaAPI:
                 return response.json().get("response", "No response received")
         except requests.RequestException as e:
             return f"Error: Could not connect to Ollama. Is it running? ({str(e)})"
-
