@@ -8,13 +8,14 @@ import markdown2
 import threading
 import time
 from settings import SettingsDialog
+from PIL import Image
+import os
 
 class ChatApp:
-    def __init__(self, root, api, agent=None):
-        """Initialize the chat application GUI with Markdown and agentic support."""
+    def __init__(self, root, api):
+        """Initialize the chat application GUI with Markdown support."""
         self.root = root
         self.api = api
-        self.agent = agent  # AgenticWorkflow instance, optional
         self.root.title("PyLlamaUI")
         self.root.geometry("600x500")
 
@@ -40,28 +41,28 @@ class ChatApp:
         self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(1, weight=1)
 
-        # Model name label
-        self.model_label = ctk.CTkLabel(
-            self.main_frame,
-            text=f"Model: {self.api.model}",
-            font=("Arial", 12, "bold")
-        )
-        self.model_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
+        # Logo and Title Header
+        self.header_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        self.header_frame.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        
+        # Load Logo
+        try:
+            image_path = os.path.join(os.path.dirname(__file__), "PyLlamaUI.png")
+            self.logo_image = ctk.CTkImage(light_image=Image.open(image_path), 
+                                           dark_image=Image.open(image_path), 
+                                           size=(40, 40))
+            self.logo_label = ctk.CTkLabel(self.header_frame, text="", image=self.logo_image)
+            self.logo_label.pack(side="left", padx=5)
+        except Exception as e:
+            print(f"Error loading logo: {e}")
 
-        # Mode selection (Normal or Agentic)
-        self.mode_var = tk.StringVar(value="Normal")
-        self.mode_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.mode_frame.grid(row=0, column=0, sticky="e", padx=5, pady=5)
-        self.normal_radio = ctk.CTkRadioButton(
-            self.mode_frame, text="Normal", variable=self.mode_var, value="Normal",
-            fg_color="#8A2BE2", hover_color="#7B1FA2"  # Violet
+        # Model name label (next to logo)
+        self.model_label = ctk.CTkLabel(
+            self.header_frame,
+            text=f"Model: {self.api.model}",
+            font=("Arial", 14, "bold")
         )
-        self.normal_radio.grid(row=0, column=0, padx=(0, 5))
-        self.agentic_radio = ctk.CTkRadioButton(
-            self.mode_frame, text="Agentic", variable=self.mode_var, value="Agentic",
-            fg_color="#8A2BE2", hover_color="#7B1FA2"  # Violet
-        )
-        self.agentic_radio.grid(row=0, column=1, padx=(0, 5))
+        self.model_label.pack(side="left", padx=10)
 
         # Chat display (scrollable text area with Markdown rendering)
         self.chat_display = scrolledtext.ScrolledText(
@@ -99,15 +100,7 @@ class ChatApp:
         for i in range(7):
             self.button_frame.grid_columnconfigure(i, weight=0)
 
-        # Settings button
-        self.settings_button = ctk.CTkButton(
-            self.button_frame,
-            text="⚙️",
-            width=40,
-            command=self.open_settings,
-            fg_color="#8A2BE2", hover_color="#7B1FA2"
-        )
-        self.settings_button.grid(row=0, column=0, padx=(0,5))
+        # (Settings button removed)
 
         # Theme button
         self.theme_var = tk.StringVar(value="Dark")
@@ -155,6 +148,15 @@ class ChatApp:
 
         # Bind Enter key to send message or run agent
         self.prompt_entry.bind("<Return>", lambda event: self.send_or_stop())
+
+        # Footer
+        self.footer_label = ctk.CTkLabel(
+            self.main_frame,
+            text="PyLlamaUI : Unplug the Intelligence",
+            font=("Arial", 10),
+            text_color="gray"
+        )
+        self.footer_label.grid(row=4, column=0, pady=(5, 0))
 
     def open_settings(self):
         SettingsDialog(self.root)
@@ -225,10 +227,7 @@ class ChatApp:
         if self._streaming:
             self.stop_streaming()
         else:
-            if self.mode_var.get() == "Normal":
-                self.send_message()
-            else:
-                self.run_agent()
+            self.send_message()
 
     def send_message(self):
         """Handle sending the prompt and displaying the streamed response (Normal mode)."""
@@ -280,41 +279,9 @@ class ChatApp:
             self._streaming = False
         self.root.after(0, reset)
 
-    def run_agent(self):
-        """Run an agentic workflow based on the prompt (Agentic mode)."""
-        if not self.agent:
-            self._show_popup("Error", "Agent not initialized")
-            return
 
-        prompt = self.prompt_entry.get()
-        if not prompt.strip():
-            return
 
-        self._display_message("You", f": {prompt}\n", align="right", speaker_type="user")
-        self.prompt_entry.delete(0, tk.END)
 
-        self.prompt_entry.configure(state="disabled")
-        self._stop_stream.clear()
-        self._streaming = True
-        self.send_button.configure(text="Stop", state="normal")
-
-        threading.Thread(target=self._run_agent_tasks, args=(prompt,), daemon=True).start()
-
-    def _run_agent_tasks(self, prompt):
-        """Execute agentic tasks and display results."""
-        self._display_message("PyLlamaUI", ": Processing...\n", align="left", speaker_type="bot")
-        self.agent.add_task("process", prompt)
-
-        for result in self.agent.run_tasks():
-            if self._stop_stream.is_set():
-                break
-            self._display_message(None, result + "\n", align="left", speaker_type="bot")
-
-        def reset():
-            self.prompt_entry.configure(state="normal")
-            self.send_button.configure(text="Send", state="normal")
-            self._streaming = False
-        self.root.after(0, reset)
 
     def undo(self):
         """Undo the last prompt and response in Normal mode."""
@@ -336,8 +303,8 @@ class ChatApp:
         if self.undo_stack:
             prompt, response = self.undo_stack.pop()
             self.prompt_stack.append((prompt, response))
-            self._display_message("You", f": {prompt}\n", align="right", speaker_type="user")
-            self._display_message("PyLlamaUI", f": {response}\n", align="left", speaker_type="bot")
+            self._display_message("You", f" : {prompt}\n", align="right", speaker_type="user")
+            self._display_message("PyLlamaUI", f" : {response}\n", align="left", speaker_type="bot")
 
     def _display_message(self, speaker_name, text_content, align="left", append=False, speaker_type="bot"):
         """Display a message in the chat window with alignment and styling."""
