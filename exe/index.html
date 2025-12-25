@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install PyLlamaUI for VS Code - Official Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme */
+            --bg-color: #ffffff;
+            --text-color: #1a1a1a;
+            --text-muted: #6b7280;
+            --accent-color: #0ea5e9;
+            /* Sky blue */
+            --accent-hover: #0284c7;
+            --border-color: #e5e7eb;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            --nav-bg: rgba(255, 255, 255, 0.85);
+            --card-bg: #f9fafb;
+            --code-bg: #1e1e1e;
+            --code-text: #e5e5e5;
+            --success: #10b981;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            /* Pure Dark Theme */
+            --bg-color: #000000;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-color: #818cf8;
+            /* Indigo/Violet */
+            --accent-hover: #6366f1;
+            --border-color: #27272a;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --nav-bg: rgba(0, 0, 0, 0.8);
+            --card-bg: #111111;
+            --code-bg: #09090b;
+            --code-text: #e5e5e5;
+            --success: #34d399;
+            --shadow: 0 10px 30px -10px rgba(129, 140, 248, 0.2);
+            --vs-brand: #007acc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0.8;
+            transition: opacity 0.2s, color 0.2s;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+
+        #theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        #theme-toggle:hover {
+            background: var(--glass-bg);
+            border-color: var(--accent-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 9rem 0 5rem;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+            opacity: 0.08;
+            filter: blur(90px);
+            z-index: -1;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: flex-start;
+        }
+
+        .hero-text h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-text p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 550px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+            border: 1px solid transparent;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            background: var(--glass-bg);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-color);
+            background: var(--card-bg);
+        }
+
+        /* Install Box */
+        .install-box {
+            margin-top: 2rem;
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+        }
+
+        .tab {
+            color: var(--text-muted);
+            cursor: pointer;
+            padding-bottom: 0.25rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+        }
+
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .prompt {
+            color: var(--accent-color);
+            font-weight: 700;
+            user-select: none;
+        }
+
+        .cmd {
+            color: var(--code-text);
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 4.5rem;
+            right: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--code-text);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 6rem 0;
+            background: var(--card-bg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .glass-panel {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            border-radius: 16px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: var(--card-bg);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Requirements List */
+        .req-list li {
+            list-style: none;
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .req-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            padding: 3rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            margin-top: 4rem;
+        }
+
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-text p {
+                margin: 0 auto 2.5rem;
+            }
+            .install-box {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="container nav-container">
+            <a href="https://bhuvanesh-m-dev.github.io/pyllamaui" class="logo">
+                <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="PyLlamaUI Logo">
+                PyLlamaUI
+            </a>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#requirements">Requirements</a>
+                <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui" target="_blank">Marketplace</a>
+                <button id="theme-toggle" aria-label="Toggle theme">
+                    <span id="theme-icon">☀️</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div
+                    style="display:inline-block; background:rgba(0, 122, 204, 0.15); color:#3ea6ff; padding:0.25rem 0.85rem; border-radius:30px; border:1px solid rgba(0, 122, 204, 0.3); font-weight:600; font-size:0.8rem; margin-bottom:1.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    💙 Available for VS Code
+                </div>
+                <h1>Your AI Assistant, <br>Right Inside the Editor.</h1>
+                <p>
+                    Chat with local LLMs, generate code, and format markdown without leaving Visual Studio Code. 
+                    Completely offline. No telemetry.
+                </p>
+                <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom: 2rem;">
+                    <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui"
+                        class="btn btn-primary" target="_blank">
+                        <span style="font-size: 1.2rem;">📥</span> Install Extension
+                    </a>
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" class="btn btn-secondary" target="_blank">
+                        View Source
+                    </a>
+                </div>
+            </div>
+
+            <div class="install-card">
+                <div class="install-box">
+                    <div class="tabs">
+                        <div class="tab active">Command Palette</div>
+                        <div class="tab">CLI</div>
+                    </div>
+                    <div style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.8rem;">
+                        Open VS Code and press <kbd style="background:rgba(255,255,255,0.1); padding:2px 4px; border-radius:4px;">Ctrl+P</kbd>
+                    </div>
+                    <button class="copy-btn" id="copyBtn">Copy</button>
+                    <div class="command-line">
+                        <span class="prompt">></span>
+                        <span class="cmd" id="installCmd">ext install bhuvanesh-m-dev.pyllamaui</span>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                    Latest Version: <strong style="color: var(--text-color);">v0.1.6</strong> • 
+                    <span style="color: var(--success);">Stable</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="features" class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2>Built for Developers</h2>
+                <p>Enhance your coding workflow with local AI integration.</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="glass-panel">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Local Intelligence</h3>
+                    <p style="color:var(--text-muted);">
+                        Powered by Ollama. Use models like Llama3, Mistral, or DeepSeek directly in your side panel.
+                    </p>
+                </div>
+                <div class="glass-panel">
+                    <div class="feature-icon">📝</div>
+                    <h3>Rich Markdown</h3>
+                    <p style="color:var(--text-muted);">
+                        Full rendering support for bold, italics, tables, and lists. Read responses clearly.
+                    </p>
+                </div>
+                <div class="glass-panel">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Syntax Highlighting</h3>
+                    <p style="color:var(--text-muted);">
+                        Code blocks for Python, JS, JSON, and Bash are automatically highlighted for readability.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="requirements" style="padding: 5rem 0; border-top: 1px solid var(--border-color);">
+        <div class="container">
+            <div class="glass-panel" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; md:flex-row; gap: 2rem;">
+                <div>
+                    <h3 style="margin-bottom: 1rem;">🛠️ System Requirements</h3>
+                    <p style="color:var(--text-muted); margin-bottom: 1.5rem;">
+                        Before installing, ensure your environment is ready to run local LLMs efficiently.
+                    </p>
+                    <ul class="req-list">
+                        <li><strong>VS Code</strong> v1.75.0 or higher</li>
+                        <li><strong>Python</strong> v3.10+ installed and added to PATH</li>
+                        <li><strong>Ollama</strong> running in the background</li>
+                    </ul>
+                </div>
+                <div style="background: var(--code-bg); padding: 1.5rem; border-radius: 8px; flex-grow: 1;">
+                    <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 0.9rem;">Quick Setup Check:</h4>
+                    <code style="color: var(--accent-color); font-family: 'JetBrains Mono'; display: block; margin-bottom: 0.5rem;">$ python --version</code>
+                    <code style="color: var(--accent-color); font-family: 'JetBrains Mono'; display: block;">$ ollama serve</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div style="font-weight: 700; margin-bottom: 0.5rem;">PyLlamaUI Extension</div>
+            <p>&copy; 2025 - Present  Bhuvanesh M. Released under MIT License.</p>
+            <div style="margin-top: 1rem;">
+                <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui" style="color: var(--text-muted); text-decoration: none; font-size: 0.85rem;">Marketplace Page</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const copyBtn = document.getElementById('copyBtn');
+        const installCmd = document.getElementById('installCmd');
+
+        // Theme Logic
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateIcon(savedTheme);
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
+        });
+
+        function updateIcon(theme) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Copy Logic
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(installCmd.innerText).then(() => {
+                const originalText = copyBtn.innerText;
+                copyBtn.innerText = 'Copied!';
+                copyBtn.style.borderColor = 'var(--success)';
+                copyBtn.style.color = 'var(--success)';
+                setTimeout(() => {
+                    copyBtn.innerText = originalText;
+                    copyBtn.style.borderColor = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+
+</html>
