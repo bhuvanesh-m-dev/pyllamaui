@@ -219,6 +219,74 @@
         .flex.flex-wrap.border-b {
             border-bottom-color: rgba(255, 255, 255, 0.05);
         }
+
+        /* Video container styling */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.75rem;
+        }
+
+        /* Unmute button styling */
+        .unmute-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .unmute-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: scale(1.05);
+        }
+
+        .demo-video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Custom Styles for Hero and Logo */
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+        .hero-img-container img {
+            width: 100%;
+            max-width: 500px;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-img-container {
+            display: flex;
+            justify-content: center;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
     </style>
 </head>
 
@@ -228,15 +296,19 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <i data-feather="cpu" class="text-primary-500 h-6 w-6"></i>
-                        <span class="ml-2 text-xl font-bold">PyLlamaUI</span>
+                    <div class="flex-shrink-0 flex items-center logo">
+                        <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" 
+                             alt="PyLlamaUI Logo" 
+                             class="mr-2">
+                        <span class="text-xl font-bold">PyLlamaUI</span>
                     </div>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-center space-x-4">
                         <a href="#features"
                             class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Features</a>
+                        <a href="#demos"
+                            class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Demos</a>
                         <a href="#installation"
                             class="px-3 py-2 rounded-md text-sm font-medium hover:text-primary-500 transition">Installation</a>
                         <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
@@ -258,6 +330,8 @@
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <a href="#features"
                     class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Features</a>
+                <a href="#demos"
+                    class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Demos</a>
                 <a href="#installation"
                     class="block px-3 py-2 rounded-md text-base font-medium hover:text-primary-500 transition">Installation</a>
                 <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank"
@@ -266,9 +340,10 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Logo -->
     <section id="hero" class="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div class="text-center">
+            
             <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 fade-in">Run LLMs Offline, <span
                     class="text-primary-500">Your Way</span>.</h1>
             <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10 fade-in" style="animation-delay: 0.2s;">
@@ -283,10 +358,10 @@
                     class="border border-white/10 hover:border-primary-500 hover:text-primary-500 font-medium py-3 px-6 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 glossy">
                     View on GitHub
                 </a>
-            </div>
-            <div class="mt-16 fade-in" style="animation-delay: 0.6s;">
-                <img src="http://static.photos/technology/1024x576/42" alt="PyLlamaUI Interface"
-                    class="rounded-xl shadow-2xl border border-white/5 max-w-full mx-auto glossy">
+            </div><br><br><br>
+            <div class="hero-img-container mb-8 fade-in">
+                <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" 
+                     alt="PyLlamaUI Logo">
             </div>
         </div>
     </section>
@@ -376,6 +451,65 @@
         </div>
     </section>
 
+    <!-- Demos Section -->
+    <section id="demos" class="py-20 px-4 sm:px-6 lg:px-8 bg-space-800/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">See PyLlamaUI in Action</h2>
+                <!-- <p class="text-lg text-gray-300 max-w-3xl mx-auto fade-in" style="animation-delay: 0.2s;">Watch our demo videos to see how PyLlamaUI works across different platforms and features.</p> -->
+            </div>
+
+            <!-- All 3 Videos in Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                <!-- Original Test Demo -->
+                <div class="fade-in">
+                    <div class="video-container glossy">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/Nh6sstoH7OY?si=3iwhPPYlWiV2qPzX" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2">Initial Release Demo</h3>
+                        <p class="text-gray-300">First look at PyLlamaUI with basic chat functionality.</p>
+                    </div>
+                </div>
+
+                <!-- Updated Markdown Demo -->
+                <div class="fade-in" style="animation-delay: 0.2s;">
+                    <div class="video-container glossy">
+                        <iframe src="https://www.youtube.com/embed/mTqb-VupE8A" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2">Markdown Support</h3>
+                        <p class="text-gray-300">Enhanced version with markdown rendering support.</p>
+                    </div>
+                </div>
+
+                <!-- Auto-playing Muted Video -->
+                <div class="fade-in" style="animation-delay: 0.4s;">
+                    <div class="video-container glossy">
+                        <iframe id="autoplay-video" 
+                                src="https://www.youtube.com/embed/TmVP-wQsPpU?autoplay=1&mute=1&loop=1&playlist=TmVP-wQsPpU" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                        </iframe>
+                        <button id="unmute-btn" class="unmute-btn">
+                            <i data-feather="volume-x" class="h-4 w-4"></i>
+                            Unmute
+                        </button>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2">Quick Preview</h3>
+                        <p class="text-gray-300">Auto-playing preview (click unmute for sound)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Installation Section -->
     <section id="installation" class="py-20 px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
@@ -408,15 +542,20 @@
                 <div class="glossy p-6 md:p-8 border-white/5">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Windows Installer</h3>
-                            <p class="text-gray-300 mb-4 md:mb-0">Download the .exe installer for a simple setup
-                                experience.</p>
+                            <h3 class="text-xl font-semibold mb-2">Windows Desktop App (.exe)</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Stand-alone offline desktop UI with .exe installer for a simple setup experience.</p>
                         </div>
-                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/download/windows-exe-v0.1/pyllamaui.exe"
-                            class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
-                            <i data-feather="download" class="h-5 w-5"></i>
-                            Download for Windows (.exe)
-                        </a>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/windows/"
+                               class="border border-primary-500 text-primary-500 hover:bg-primary-500/10 font-medium py-3 px-6 rounded-lg transition duration-300 glossy text-center">
+                                More Details
+                            </a>
+                            <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/download/windows-exe-v0.1/pyllamaui.exe"
+                                class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                                <i data-feather="download" class="h-5 w-5"></i>
+                                Download .exe
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -425,15 +564,20 @@
                 <div class="glossy p-6 md:p-8 border-white/5">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Linux Installer</h3>
-                            <p class="text-gray-300 mb-4 md:mb-0">Download the .deb package for Debian, Ubuntu, and
-                                ZentoraOS.</p>
+                            <h3 class="text-xl font-semibold mb-2">Linux Package (.deb)</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Linux package for Debian, Ubuntu, and ZentoraOS as a stand-alone desktop app.</p>
                         </div>
-                        <a href="#"
-                            class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
-                            <i data-feather="download" class="h-5 w-5"></i>
-                            Download for Linux (.deb)
-                        </a>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/linux/"
+                               class="border border-primary-500 text-primary-500 hover:bg-primary-500/10 font-medium py-3 px-6 rounded-lg transition duration-300 glossy text-center">
+                                More Details
+                            </a>
+                            <a href="#"
+                                class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                                <i data-feather="download" class="h-5 w-5"></i>
+                                Download .deb
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -442,12 +586,17 @@
                 <div class="glossy p-6 md:p-8 border-white/5">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Install with Pip</h3>
-                            <p class="text-gray-300 mb-4 md:mb-0">For developers. Install directly from the Python
-                                Package Index.</p>
+                            <h3 class="text-xl font-semibold mb-2">Python Project / Source Code</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">Python-based toolkit for developers. Install directly from the Python Package Index.</p>
                         </div>
-                        <div class="bg-white/3 rounded-lg p-4 font-mono text-sm overflow-x-auto glossy">
-                            <span class="text-gray-400">$ </span>pip install pyllamaui
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/python-idle/"
+                               class="border border-primary-500 text-primary-500 hover:bg-primary-500/10 font-medium py-3 px-6 rounded-lg transition duration-300 glossy text-center">
+                                More Details
+                            </a>
+                            <div class="bg-white/3 rounded-lg p-4 font-mono text-sm overflow-x-auto glossy">
+                                <span class="text-gray-400">$ </span>pip install pyllamaui
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -457,14 +606,20 @@
                 <div class="glossy p-6 md:p-8 border-white/5">
                     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">VS Code Extension</h3>
-                            <p class="text-gray-300 mb-4 md:mb-0">Integrate PyLlamaUI directly into your editor.</p>
+                            <h3 class="text-xl font-semibold mb-2">Code-editor / VS Code Extension</h3>
+                            <p class="text-gray-300 mb-4 md:mb-0">IDE-integrated chat panel for Visual Studio Code.</p>
                         </div>
-                        <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui"
-                            class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
-                            <i data-feather="download" class="h-5 w-5"></i>
-                            Install from Marketplace
-                        </a>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/exe/"
+                               class="border border-primary-500 text-primary-500 hover:bg-primary-500/10 font-medium py-3 px-6 rounded-lg transition duration-300 glossy text-center">
+                                More Details
+                            </a>
+                            <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui"
+                                class="bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center gap-2 whitespace-nowrap glossy">
+                                <i data-feather="download" class="h-5 w-5"></i>
+                                Install Extension
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -472,7 +627,7 @@
     </section>
 
     <!-- How It Works Section -->
-    <section id="quick-start" class="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="quick-start" class="py-20 px-4 sm:px-6 lg:px-8 bg-space-800/30">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Simple Three-Step Setup</h2>
@@ -545,8 +700,10 @@
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div class="flex items-center">
-                    <i data-feather="cpu" class="text-primary-500 h-6 w-6"></i>
-                    <span class="ml-2 text-lg font-bold">PyLlamaUI</span>
+                    <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" 
+                         alt="PyLlamaUI Logo" 
+                         class="h-6 w-6 mr-2">
+                    <span class="text-lg font-bold">PyLlamaUI</span>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-6">
                     <a href="https://github.com/bhuvaneshm/pyllamaui" target="_blank"
@@ -575,6 +732,26 @@
         document.getElementById('mobile-menu-button').addEventListener('click', function () {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
+        });
+
+        // Unmute button functionality
+        const unmuteBtn = document.getElementById('unmute-btn');
+        const videoIframe = document.getElementById('autoplay-video');
+        let isMuted = true;
+
+        unmuteBtn.addEventListener('click', function() {
+            if (isMuted) {
+                // Change to unmuted URL
+                videoIframe.src = videoIframe.src.replace('mute=1', 'mute=0');
+                unmuteBtn.innerHTML = '<i data-feather="volume-2" class="h-4 w-4"></i>Mute';
+                isMuted = false;
+            } else {
+                // Change back to muted URL
+                videoIframe.src = videoIframe.src.replace('mute=0', 'mute=1');
+                unmuteBtn.innerHTML = '<i data-feather="volume-x" class="h-4 w-4"></i>Unmute';
+                isMuted = true;
+            }
+            feather.replace();
         });
 
         // Detect OS and update download button text
