@@ -1,1 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLlamaUI v0.3 | Linux Fix & Milestones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#050505',
+                            card: '#0f0f12',
+                            border: '#27272a',
+                            primary: '#00ff88', // Neon green from original
+                            accent: '#8b5cf6',  // Purple
+                            success: '#10b981',
+                            danger: '#ef4444',
+                            text: '#e4e4e7',
+                            muted: '#a1a1aa'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 20px rgba(0, 255, 136, 0.5)' },
+                            '50%': { opacity: 0.8, boxShadow: '0 0 10px rgba(0, 255, 136, 0.2)' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #050505;
+            color: #e4e4e7;
+            overflow-x: hidden;
+        }
+        
+        /* Animated Background Grid */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            z-index: -1;
+        }
 
+        /* Glass Panel Effect */
+        .glass-panel {
+            background: rgba(15, 15, 18, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 136, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: linear-gradient(to right, #00ff88, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Code Block Styling */
+        .code-block {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0d0d10;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+        }
+
+        /* Custom Glow Effects */
+        .glow {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .glow:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Logo Animation */
+        .logo-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        /* Status Badge Pulse */
+        .status-pulse {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Terminal Cursor */
+        .terminal-cursor {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-primary selection:text-black font-sans">
+
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-brand-primary/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob"></div>
+    <div class="fixed top-0 right-1/4 w-96 h-96 bg-brand-accent/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob animation-delay-2000"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-panel border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="window.scrollTo(0,0)">
+                    <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="PyLlamaUI Logo" class="h-10 w-10 rounded-lg shadow-lg shadow-brand-primary/20 ring-2 ring-white/10 logo-float">
+                    <div>
+                        <span class="font-bold text-xl tracking-tight text-white block leading-none">PyLlamaUI</span>
+                        <span class="text-[10px] font-mono text-brand-muted uppercase tracking-widest">Linux Edition</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                    <a href="https://bhuvanesh-m-dev.github.io/pyllamaui" class="text-brand-muted hover:text-white transition-colors">Docs</a>
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/milestones" class="text-brand-muted hover:text-white transition-colors">Milestones</a>
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/issues" class="text-brand-muted hover:text-white transition-colors">Issues</a>
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/tag/linux-v0.3.deb" class="group relative px-5 py-2.5 bg-brand-primary hover:bg-green-500 text-black font-bold rounded-full transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] overflow-hidden">
+                        <span class="relative z-10 flex items-center gap-2">
+                            <i class="fa-brands fa-linux"></i> Download v0.3
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-40 pb-20 lg:pt-52 lg:pb-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center gap-16">
+            
+            <!-- Content -->
+            <div class="lg:w-1/2 z-10 fade-in">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-success/10 border border-brand-success/20 text-brand-success text-xs font-mono font-bold mb-8 status-pulse">
+                    <span class="w-2 h-2 rounded-full bg-brand-success"></span>
+                    RESOLVED IN v0.3
+                </div>
+                
+                <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1]">
+                    Linux Crash <br>
+                    <span class="gradient-text">Fixed & Ready.</span>
+                </h1>
+                
+                <p class="text-lg text-brand-muted mb-10 leading-relaxed max-w-xl">
+                    The <code class="text-brand-danger bg-brand-danger/10 px-1 rounded">markdown2</code> dependency issue has been eliminated. 
+                    Experience the stable, stunning developer-focused interface for your local LLMs.
+                </p>
+                
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/tag/linux-v0.3.deb" class="px-8 py-4 bg-brand-primary hover:bg-green-500 text-black font-bold rounded-xl transition-all shadow-lg shadow-green-900/20 flex items-center gap-3 transform hover:-translate-y-1 glow">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Get .deb Package</span>
+                    </a>
+                    <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/linux" class="px-8 py-4 glass-panel hover:bg-white/5 text-white font-semibold rounded-xl transition-all flex items-center gap-3 border border-white/10 glow">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Read the Docs</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Terminal Visual -->
+            <div class="lg:w-1/2 w-full relative animate-float fade-in">
+                <!-- Glow -->
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-brand-primary to-brand-accent rounded-2xl blur opacity-30"></div>
+                
+                <div class="relative rounded-2xl bg-[#0a0a0c] border border-white/10 shadow-2xl overflow-hidden code-block">
+                    <!-- Terminal Header -->
+                    <div class="flex items-center gap-2 px-4 py-3 bg-[#151518] border-b border-white/5">
+                        <div class="flex gap-1.5">
+                            <div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                            <div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+                        </div>
+                        <div class="flex-1 text-center text-xs font-mono text-gray-500">root@linux: ~</div>
+                    </div>
+                    
+                    <!-- Terminal Body -->
+                    <div class="p-6 font-mono text-sm leading-relaxed h-[340px] overflow-y-auto">
+                        <div class="opacity-50 mb-2">$ cat /var/log/pyllamaui/crash.log</div>
+                        <div class="text-brand-danger mb-4 p-3 bg-brand-danger/5 rounded border-l-2 border-brand-danger">
+                            <span class="font-bold">ERROR:</span> ModuleNotFoundError<br>
+                            No module named 'markdown2'<br>
+                            <span class="opacity-70 text-xs">at /usr/bin/pyllamaui line 6</span>
+                        </div>
+                        
+                        <div class="opacity-50 mb-2">$ apt show pyllamaui</div>
+                        <div class="text-brand-muted mb-4">
+                            Package: pyllamaui<br>
+                            Version: <span class="text-brand-success font-bold">0.3</span><br>
+                            Depends: python3, python3-pyqt6, <span class="text-brand-primary font-bold">python3-markdown2</span>
+                        </div>
+
+                        <div class="opacity-50 mb-2">$ pyllamaui --status</div>
+                        <div class="text-brand-success font-bold mb-2">
+                            [OK] Dependency Check Passed<br>
+                            [OK] UI Framework Initialized<br>
+                            [OK] Ready for Interaction
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mt-4">
+                            <span class="text-brand-success">➜</span>
+                            <span class="text-brand-primary">~</span>
+                            <span class="w-2.5 h-5 bg-white terminal-cursor"></span>
+                        </div>
+                    </div>
+                </div>
+                
+<!-- Floating Status Card -->
+<div class="absolute -bottom-8 -left-8 glass-panel p-4 rounded-xl border border-brand-success/30 shadow-xl flex items-center gap-4 animate-[float_8s_ease-in-out_infinite_reverse] glow">
+
+    <!-- Logo Badge -->
+    <div class="w-12 h-12 rounded-full bg-brand-success/20 flex items-center justify-center">
+        <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png"
+             alt="PyLlamaUI Logo"
+             class="w-10 h-10 rounded-lg">
+    </div>
+
+    <!-- Status Text -->
+    <div>
+        <div class="text-xs text-brand-muted uppercase font-bold tracking-wider">
+            Status
+        </div>
+        <div class="font-bold text-white">
+            Fully Resolved
+        </div>
+    </div>
+</div>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Issue Details Section -->
+    <section class="py-24 relative">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold mb-4">Issue Resolution</h2>
+                <p class="text-brand-muted max-w-2xl mx-auto">Complete breakdown of the Linux .deb crash and its resolution</p>
+            </div>
+
+            <div class="glass-panel p-8 rounded-2xl mb-8 fade-in glow">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-3 h-3 rounded-full bg-brand-danger"></div>
+                    <h3 class="text-2xl font-bold">The Problem</h3>
+                    <span class="px-3 py-1 bg-brand-danger/10 text-brand-danger text-xs font-mono rounded-full">v0.2</span>
+                </div>
+                
+                <div class="code-block p-6 rounded-lg mb-6">
+                    <div class="text-brand-danger font-mono">
+                        <span class="text-brand-primary">$</span> pyllamaui<br>
+                        Traceback (most recent call last):<br>
+                        &nbsp;&nbsp;File "/usr/bin/pyllamaui", line 6, in &lt;module&gt;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;import markdown2<br>
+                        ModuleNotFoundError: <span class="font-bold">No module named 'markdown2'</span>
+                    </div>
+                </div>
+                
+                <p class="text-brand-muted">
+                    The v0.2 Linux .deb package failed to include the <code class="text-white bg-white/10 px-1 rounded">python3-markdown2</code> dependency 
+                    in its control file, causing the application to crash immediately after installation.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Root Cause -->
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group fade-in glow">
+                    <div class="w-12 h-12 rounded-lg bg-brand-danger/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-magnifying-glass-chart text-brand-danger text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Root Cause</h3>
+                    <p class="text-brand-muted text-sm leading-relaxed">
+                        The dependency was not declared in the Debian package control file, causing fresh installations to fail on startup.
+                    </p>
+                </div>
+
+                <!-- The Fix -->
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group fade-in glow border-brand-primary/30 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-brand-primary/10 rounded-bl-full -mr-4 -mt-4"></div>
+                    <div class="w-12 h-12 rounded-lg bg-brand-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-code-commit text-brand-primary text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-white">The Fix (v0.3)</h3>
+                    <ul class="space-y-2 text-sm text-brand-muted">
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-brand-success"></i> Added <code class="text-brand-primary">python3-markdown2</code>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-brand-success"></i> Rebuilt .deb installer
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fa-solid fa-check text-brand-success"></i> Verified launch stability
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/5 transition-all group fade-in glow">
+                    <div class="w-12 h-12 rounded-lg bg-brand-accent/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-layer-group text-brand-accent text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Resources</h3>
+                    <div class="flex flex-col gap-2 text-sm">
+                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/milestones" class="flex items-center gap-2 text-brand-muted hover:text-white transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i> View Milestones
+                        </a>
+                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/issues" class="flex items-center gap-2 text-brand-muted hover:text-white transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i> Report Issues
+                        </a>
+                        <a href="https://bhuvanesh-m-dev.github.io/pyllamaui" class="flex items-center gap-2 text-brand-muted hover:text-white transition-colors">
+                            <i class="fa-solid fa-arrow-right text-xs"></i> Official Docs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Links Section -->
+    <section class="py-24 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-bold mb-4">Quick Links</h2>
+                <p class="text-brand-muted max-w-2xl mx-auto">Essential resources for PyLlamaUI development</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="https://bhuvanesh-m-dev.github.io/pyllamaui" class="glass-panel p-6 rounded-2xl text-center hover:bg-white/5 transition-all group fade-in glow" target="_blank">
+                    <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🌐</div>
+                    <h3 class="font-bold mb-2">Official Page</h3>
+                    <p class="text-sm text-brand-muted">Main documentation and homepage</p>
+                </a>
+
+                <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/linux" class="glass-panel p-6 rounded-2xl text-center hover:bg-white/5 transition-all group fade-in glow" target="_blank">
+                    <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🐧</div>
+                    <h3 class="font-bold mb-2">Linux Page</h3>
+                    <p class="text-sm text-brand-muted">Linux-specific installation guides</p>
+                </a>
+
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/milestones" class="glass-panel p-6 rounded-2xl text-center hover:bg-white/5 transition-all group fade-in glow" target="_blank">
+                    <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🎯</div>
+                    <h3 class="font-bold mb-2">Milestones</h3>
+                    <p class="text-sm text-brand-muted">Track development progress</p>
+                </a>
+
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/issues" class="glass-panel p-6 rounded-2xl text-center hover:bg-white/5 transition-all group fade-in glow" target="_blank">
+                    <div class="text-3xl mb-4 group-hover:scale-110 transition-transform">🐛</div>
+                    <h3 class="font-bold mb-2">Issue Tracker</h3>
+                    <p class="text-sm text-brand-muted">Report bugs and request features</p>
+                </a>
+            </div>
+
+            <div class="text-center mt-12 fade-in">
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui/releases/tag/linux-v0.3.deb" class="inline-flex items-center gap-3 px-8 py-4 bg-brand-primary hover:bg-green-500 text-black font-bold rounded-xl transition-all shadow-lg shadow-green-900/20 transform hover:-translate-y-1 glow text-lg" target="_blank">
+                    <i class="fa-solid fa-download"></i>
+                    Download v0.3 .deb Package
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-[#020203] py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-4">
+                <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="Logo" class="h-12 w-12 rounded-lg grayscale hover:grayscale-0 transition-all logo-float">
+                <div>
+                    <span class="font-bold text-white block">PyLlamaUI</span>
+                    <span class="text-xs text-brand-muted">© 2026 - Present Bhuvanesh M.</span>
+                </div>
+            </div>
+            
+            <div class="flex gap-6">
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" class="text-brand-muted hover:text-white transition-colors text-xl">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="https://bhuvanesh-m-dev.github.io/pyllamaui" class="text-brand-muted hover:text-white transition-colors text-xl">
+                    <i class="fa-solid fa-globe"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add interactive effects
+        document.querySelectorAll('.glass-panel').forEach(panel => {
+            panel.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            
+            panel.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Typing effect for terminal
+        const terminalContent = document.querySelector('.code-block');
+        if (terminalContent) {
+            const originalHTML = terminalContent.innerHTML;
+            terminalContent.innerHTML = '';
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < originalHTML.length) {
+                    terminalContent.innerHTML = originalHTML.substring(0, i + 1);
+                    i += 10;
+                    setTimeout(typeWriter, 10);
+                }
+            };
+            
+            setTimeout(typeWriter, 1000);
+        }
+    </script>
+</body>
+</html>
