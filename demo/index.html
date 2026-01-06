@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLlamaUI - Project Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Back to top button visibility transition */
+        #backToTop {
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        #backToTop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen relative">
+
+    <!-- Navigation / Header -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="PyLlamaUI Logo" class="h-10 w-10 mr-3 rounded-md shadow-sm">
+                    <span class="font-bold text-xl tracking-tight text-gray-900">PyLlamaUI</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-500">
+                    <a href="#abstract" class="hover:text-blue-600 transition">Abstract</a>
+                    <a href="#problem" class="hover:text-blue-600 transition">Why It Matters</a>
+                    <a href="#features" class="hover:text-blue-600 transition">Key Features</a>
+                    <a href="#mentions" class="hover:text-blue-600 transition">Mentions</a>
+                    <a href="#team" class="hover:text-blue-600 transition">The Team</a>
+                </div>
+                <!-- Mobile menu button (simple implementation) -->
+                <div class="md:hidden flex items-center">
+                    <a href="#abstract" class="text-gray-500 hover:text-blue-600 px-3"><i class="fas fa-bars"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header id="top" class="bg-white">
+        <div class="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
+                Bringing AI <span class="gradient-text">Home</span>
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                A student-led initiative to democratize Artificial Intelligence. <br>
+                Secure, Private, and Offline—running entirely on your personal computer.
+            </p>
+            <div class="mt-10 flex justify-center gap-4 flex-wrap">
+                <a href="#abstract" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-1">
+                    Read the Abstract
+                    <i class="fa-solid fa-arrow-down ml-2"></i>
+                </a>
+                <a href="https://bhuvanesh-m-dev.github.io/pyllamaui/" target="_blank" class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition transform hover:-translate-y-1">
+                    Official Website
+                    <i class="fa-solid fa-external-link-alt ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        
+        <!-- Abstract Section -->
+        <section id="abstract" class="py-16 bg-slate-50">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden card-hover">
+                    <div class="p-8 sm:p-12">
+                        <div class="uppercase tracking-wide text-sm text-blue-600 font-bold mb-4">Project Abstract</div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">Simplifying AI for Everyone</h2>
+                        <div class="prose prose-lg text-gray-600 leading-relaxed space-y-4">
+                            <p>
+                                In today's digital world, using advanced Artificial Intelligence (AI) typically requires sending sensitive data to large corporations over the internet. This raises concerns about <strong>privacy</strong>, <strong>security</strong>, and <strong>internet dependency</strong>.
+                            </p>
+                            <p>
+                                Our team has developed <strong>PyLlamaUI</strong> to solve this problem. It is a user-friendly desktop application that allows students, researchers, and faculty to run powerful AI models (similar to ChatGPT, Gemini, Grok, DeepSeek, etc) directly on their own laptops.
+                            </p>
+                            <p class="font-medium text-gray-800 bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                                The key innovation is that PyLlamaUI works 100% offline. Once installed, no internet connection is needed, and no data ever leaves your computer.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem vs Solution (Simple Comparison) -->
+        <section id="problem" class="py-16 bg-white">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-gray-900">Why We Built This</h2>
+                    <p class="mt-4 text-lg text-gray-600">The difference between traditional AI and our Local AI solution.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- The Traditional Way -->
+                    <div class="bg-red-50 p-8 rounded-xl border border-red-100 card-hover">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center text-red-600 mr-4">
+                                <i class="fa-solid fa-cloud text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900">Traditional Online AI</h3>
+                        </div>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mt-1 mr-2"></i> Requires constant internet connection.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mt-1 mr-2"></i> Your conversations are sent to cloud servers.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mt-1 mr-2"></i> Can be slow if internet is poor.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-xmark text-red-500 mt-1 mr-2"></i> Potential privacy risks for research data.</li>
+                        </ul>
+                    </div>
+
+                    <!-- The PyLlamaUI Way -->
+                    <div class="bg-green-50 p-8 rounded-xl border border-green-100 shadow-sm card-hover">
+                        <div class="flex items-center mb-4">
+                           <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+  <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png"
+       alt="PyLlamaUI Logo"
+       class="w-8 h-8 object-contain">
+</div>
+
+                            <h3 class="text-xl font-bold text-gray-900">PyLlamaUI (Our Project)</h3>
+                        </div>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-600 mt-1 mr-2"></i> Works <strong>completely offline</strong>.</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-600 mt-1 mr-2"></i> Data stays on&nbsp;<strong>your device</strong> (100% Private).</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-600 mt-1 mr-2"></i> Zero latency (runs as fast as your computer).</li>
+                            <li class="flex items-start"><i class="fa-solid fa-check text-green-600 mt-1 mr-2"></i> Safe for sensitive research or exam prep.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section id="features" class="py-16 bg-gray-50">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold text-gray-900">Technical Highlights</h2>
+                    <p class="mt-4 text-lg text-gray-600">Built using modern, open-source technologies.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm card-hover border border-gray-100">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 mb-4">
+                            <i class="fa-brands fa-python text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Built with Python</h3>
+                        <p class="text-gray-600 text-sm">
+                            We used Python, the world's most popular programming language for data science, to create the interface.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm card-hover border border-gray-100">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-purple-600 mb-4">
+                            <i class="fa-solid fa-desktop text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Easy Interface</h3>
+                        <p class="text-gray-600 text-sm">
+                            Designed with "CustomTkinter" to look modern and be easy to use, even for non-technical students.
+                        </p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm card-hover border border-gray-100">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 mb-4">
+                            <i class="fa-solid fa-microchip text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">Efficient Backend</h3>
+                        <p class="text-gray-600 text-sm">
+                            Powered by "Ollama", a lightweight engine that lets advanced AI models run on standard laptops.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mentions Section (TSecurity) -->
+        <section id="mentions" class="py-12 bg-white border-t border-gray-100">
+            <div class="max-w-4xl mx-auto px-4">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900">Community Spotlight</h3>
+                </div>
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 card-hover">
+                    <div class="flex-1">
+                        <h4 class="text-lg font-bold text-blue-900 mb-2">Featured on TSecurity.de</h4>
+                        <p class="text-gray-600 italic">"Introducing PyllamaUI – Python + Ollama + User Interface"</p>
+                        <p class="text-sm text-gray-500 mt-2">Read the independent review about how our tool bridges the gap between Python and Ollama.</p>
+                    </div>
+                    <a href="https://tsecurity.de/de/2919145/IT+Programmierung/%F0%9F%A6%99+Introducing+PyllamaUI+%E2%80%93+Python+%2B+Ollama+%2B+User+Interface/" 
+                       target="_blank" 
+                       class="inline-flex items-center px-5 py-2.5 border border-transparent text-sm font-medium rounded-lg text-white bg-slate-800 hover:bg-slate-900 transition">
+                        Read Blog Post
+                        <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section id="team" class="py-16 bg-white border-t border-gray-100">
+            <div class="max-w-5xl mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Project Team</h2>
+                <div class="bg-blue-600 text-white rounded-xl p-8 shadow-lg">
+                    <p class="text-xl font-medium mb-2">Developed by the PyLlamaUI Team</p>
+                    <p class="text-blue-100 mb-8">Department of Computer Science Engineering</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Team Member 1 -->
+                        <div class="bg-blue-700 p-6 rounded-lg border border-blue-500 shadow-md transform hover:scale-105 transition duration-200">
+                            <div class="w-16 h-16 bg-white text-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-sm">B</div>
+                            <h3 class="font-bold text-lg text-white">BHUVANESH M</h3>
+                            <p class="text-blue-200 text-sm mt-1 uppercase tracking-wider font-semibold">Team Lead & Developer</p>
+                        </div>
+
+                        <!-- Team Member 2 -->
+                        <div class="bg-blue-700 p-6 rounded-lg border border-blue-500 shadow-md transform hover:scale-105 transition duration-200">
+                            <div class="w-16 h-16 bg-white text-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-sm">M</div>
+                            <h3 class="font-bold text-lg text-white">Mohamed Mohideen<br>Saajid S</h3>
+                            <p class="text-blue-200 text-sm mt-1 uppercase tracking-wider font-semibold">Testing Team</p>
+                        </div>
+
+                        <!-- Team Member 3 -->
+                        <div class="bg-blue-700 p-6 rounded-lg border border-blue-500 shadow-md transform hover:scale-105 transition duration-200">
+                            <div class="w-16 h-16 bg-white text-blue-700 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-sm">M</div>
+                            <h3 class="font-bold text-lg text-white">Mohan Kumar S</h3>
+                            <p class="text-blue-200 text-sm mt-1 uppercase tracking-wider font-semibold">Testing Team</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">&copy; 2025 - Present PyLlamaUI Project. Open Source & Educational.</p>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#top" id="backToTop" class="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg z-50 transform transition hover:scale-110">
+        <i class="fa-solid fa-arrow-up text-xl"></i>
+    </a>
+
+    <!-- JavaScript for Scroll visibility -->
+    <script>
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+    </script>
+
+</body>
+</html>
