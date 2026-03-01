@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLlamaUI - Local LLM Interface | Pure On-Device AI</title>
+    <meta name="description" content="Lightweight, privacy-focused desktop GUI for running Large Language Models locally. No telemetry, no cloud, 100% offline.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['Fira Code', 'monospace'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'terminal-black': '#050505',
+                        'terminal-gray': '#0a0a0a',
+                        'terminal-border': '#1a1a1a',
+                        'neon-green': '#00ff41',
+                        'neon-cyan': '#00f0ff',
+                        'neon-amber': '#ffb000',
+                        'neon-red': '#ff0040',
+                    },
+                    animation: {
+                        'cursor': 'cursor 1s step-end infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        cursor: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #00ff41, 0 0 10px #00ff41' },
+                            '100%': { boxShadow: '0 0 20px #00ff41, 0 0 30px #00ff41' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+        }
+        
+        .terminal-window {
+            background: linear-gradient(180deg, #0a0a0a 0%, #050505 100%);
+            border: 1px solid #1a1a1a;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        
+        .terminal-header {
+            background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+            border-bottom: 1px solid #222;
+        }
+        
+        .code-block {
+            background: #0d0d0d;
+            border-left: 3px solid #00ff41;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        .neon-text-green {
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            border-color: #00ff41;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, #00ff41 50%, transparent 100%);
+            opacity: 0.3;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff41;
+        }
+        
+        .typing-effect::after {
+            content: '▋';
+            animation: cursor 1s step-end infinite;
+            color: #00ff41;
+        }
+        
+        .feature-card {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid #1a1a1a;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: #00f0ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
+        }
+        
+        .status-dot {
+            box-shadow: 0 0 10px currentColor;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-neon-green selection:text-black">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-terminal-black/90 backdrop-blur-md border-b border-terminal-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-neon-green/10 rounded flex items-center justify-center border border-neon-green/30">
+                        <i class="fas fa-terminal text-neon-green text-sm"></i>
+                    </div>
+                    <span class="font-mono font-bold text-xl tracking-tight">
+                        <span class="text-neon-green">Py</span><span class="text-white">Llama</span><span class="text-neon-cyan">UI</span>
+                    </span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8 font-mono text-sm">
+                    <a href="#overview" class="text-gray-400 hover:text-neon-green transition-colors">[1] Overview</a>
+                    <a href="#features" class="text-gray-400 hover:text-neon-green transition-colors">[2] Features</a>
+                    <a href="#install" class="text-gray-400 hover:text-neon-green transition-colors">[3] Install</a>
+                    <a href="#usage" class="text-gray-400 hover:text-neon-green transition-colors">[4] Usage</a>
+                    <a href="#roadmap" class="text-gray-400 hover:text-neon-green transition-colors">[5] Roadmap</a>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui" target="_blank" class="px-4 py-2 bg-neon-green/10 border border-neon-green/50 text-neon-green font-mono text-sm rounded hover:bg-neon-green/20 transition-all">
+                        <i class="fas fa-download mr-2"></i>GET
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden grid-bg">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-terminal-black/50 to-terminal-black"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-neon-green/5 border border-neon-green/20 text-neon-green font-mono text-xs">
+                        <span class="w-2 h-2 rounded-full bg-neon-green status-dot animate-pulse"></span>
+                        <span>v1.0.0 Stable</span>
+                        <span class="text-gray-500">|</span>
+                        <span>100% Offline</span>
+                    </div>
+                    
+                    <h1 class="text-5xl lg:text-7xl font-bold font-mono leading-tight">
+                        <span class="text-white typing-effect">Local LLM</span><br>
+                        <span class="text-neon-green neon-text-green">Interface</span><br>
+                        <span class="text-gray-500 text-3xl lg:text-4xl">for Developers</span>
+                    </h1>
+                    
+                    <p class="text-lg text-gray-400 max-w-xl leading-relaxed">
+                        A lightweight, privacy-focused desktop GUI for running Large Language Models locally. 
+                        Zero telemetry. Zero cloud dependency. Pure on-device AI.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4 font-mono">
+                        <a href="#install" class="group px-6 py-3 bg-neon-green text-black font-bold rounded hover:shadow-[0_0_30px_rgba(0,255,65,0.4)] transition-all flex items-center">
+                            <i class="fas fa-rocket mr-2"></i>
+                            INITIALIZE
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="px-6 py-3 border border-gray-700 text-gray-300 rounded hover:border-neon-cyan hover:text-neon-cyan transition-all flex items-center">
+                            <i class="fab fa-github mr-2"></i>
+                            SOURCE_CODE
+                        </a>
+                    </div>
+
+                    <div class="flex items-center space-x-6 text-sm font-mono text-gray-500 pt-4">
+                        <div class="flex items-center space-x-2">
+                            <i class="fab fa-python text-neon-cyan"></i>
+                            <span>Python 3.10+</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-cube text-neon-amber"></i>
+                            <span>Ollama Powered</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-shield-alt text-neon-green"></i>
+                            <span>Privacy First</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal Demo -->
+                <div class="terminal-window rounded-lg overflow-hidden">
+                    <div class="terminal-header px-4 py-3 flex items-center justify-between">
+                        <div class="flex space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-neon-red/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-neon-amber/80"></div>
+                            <div class="w-3 h-3 rounded-full bg-neon-green/80"></div>
+                        </div>
+                        <div class="font-mono text-xs text-gray-500">pyllamaui — bash — 80x24</div>
+                        <div class="w-16"></div>
+                    </div>
+                    <div class="p-6 font-mono text-sm space-y-2 bg-black/50">
+                        <div class="text-gray-500">$ <span class="text-neon-green">ollama</span> serve</div>
+                        <div class="text-gray-400 italic">[INFO] Listening on 127.0.0.1:11434...</div>
+                        <div class="text-gray-500 mt-4">$ <span class="text-neon-cyan">pip</span> install pyllamaui</div>
+                        <div class="text-gray-400">Collecting pyllamaui...</div>
+                        <div class="text-gray-400">Successfully installed pyllamaui-1.0.0</div>
+                        <div class="text-gray-500 mt-4">$ <span class="text-neon-green">pyllamaui</span> --launch</div>
+                        <div class="text-neon-green mt-2">╔══════════════════════════════════════╗</div>
+                        <div class="text-neon-green">║  PyLlamaUI v1.0.0 [ONLINE]           ║</div>
+                        <div class="text-neon-green">║  Model: deepseek-coder:latest        ║</div>
+                        <div class="text-neon-green">║  Status: <span class="animate-pulse">●</span> Ready                   ║</div>
+                        <div class="text-neon-green">╚══════════════════════════════════════╝</div>
+                        <div class="mt-4 text-gray-300">
+                            <span class="text-neon-cyan">User:</span> Explain quantum computing in Python<br>
+                            <span class="text-neon-amber">AI:</span> Here's a simple implementation...
+                        </div>
+                        <div class="mt-2 text-neon-green animate-pulse">▋</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Overview Section -->
+    <section id="overview" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-4 mb-12">
+                <span class="font-mono text-neon-green text-sm">[01]</span>
+                <h2 class="text-3xl font-bold font-mono text-white">System Overview</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-terminal-border to-transparent"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card p-6 rounded-lg">
+                    <div class="w-12 h-12 bg-neon-green/10 rounded-lg flex items-center justify-center mb-4 border border-neon-green/30">
+                        <i class="fas fa-shield-alt text-neon-green text-xl"></i>
+                    </div>
+                    <h3 class="font-mono font-bold text-lg text-white mb-2">Privacy First</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        No data collection. No telemetry. Zero internet dependency after initial setup. 
+                        Your conversations never leave your machine.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-lg">
+                    <div class="w-12 h-12 bg-neon-cyan/10 rounded-lg flex items-center justify-center mb-4 border border-neon-cyan/30">
+                        <i class="fas fa-bolt text-neon-cyan text-xl"></i>
+                    </div>
+                    <h3 class="font-mono font-bold text-lg text-white mb-2">Lightweight Core</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Built on Python 3.10+ with customtkinter frontend. Minimal resource overhead 
+                        designed for efficient local inference.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-lg">
+                    <div class="w-12 h-12 bg-neon-amber/10 rounded-lg flex items-center justify-center mb-4 border border-neon-amber/30">
+                        <i class="fas fa-code-branch text-neon-amber text-xl"></i>
+                    </div>
+                    <h3 class="font-mono font-bold text-lg text-white mb-2">Developer Native</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Available as standalone desktop app, VS Code extension, or Python package. 
+                        Integrates seamlessly into your workflow.
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-12 terminal-window rounded-lg p-8">
+                <div class="flex items-start space-x-6">
+                    <div class="hidden md:block w-32 h-32 bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 rounded-lg border border-neon-green/30 flex items-center justify-center">
+                        <i class="fas fa-llama text-4xl text-neon-green"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-mono text-xl text-white mb-4 flex items-center">
+                            <i class="fas fa-info-circle text-neon-cyan mr-2"></i>
+                            Architecture Philosophy
+                        </h3>
+                        <p class="text-gray-400 leading-relaxed mb-4">
+                            PyLlamaUI serves as a bridge between powerful local models and an accessible interface, 
+                            eliminating the need for command line interaction or cloud-based services. The core 
+                            philosophy is <span class="text-neon-green font-mono">pure on-device AI</span>.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 font-mono text-sm">
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <i class="fas fa-check text-neon-green"></i>
+                                <span>REST API Communication</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <i class="fas fa-check text-neon-green"></i>
+                                <span>Ollama Native Integration</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <i class="fas fa-check text-neon-green"></i>
+                                <span>CustomTkinter GUI</span>
+                            </div>
+                            <div class="flex items-center space-x-2 text-gray-500">
+                                <i class="fas fa-check text-neon-green"></i>
+                                <span>VS Code Webview API</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 relative bg-terminal-gray/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-4 mb-12">
+                <span class="font-mono text-neon-cyan text-sm">[02]</span>
+                <h2 class="text-3xl font-bold font-mono text-white">Features & Capabilities</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-terminal-border to-transparent"></div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Feature List -->
+                <div class="space-y-6">
+                    <div class="group p-6 rounded-lg border border-terminal-border hover:border-neon-green/50 transition-all bg-terminal-black/50">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded bg-neon-green/10 flex items-center justify-center border border-neon-green/30 text-neon-green">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-mono font-bold text-white mb-2">Interactive Chat UI</h3>
+                                <p class="text-gray-400 text-sm">Clean, responsive interface available as standalone desktop app or directly inside VS Code. Distraction-free workspace design.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group p-6 rounded-lg border border-terminal-border hover:border-neon-cyan/50 transition-all bg-terminal-black/50">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded bg-neon-cyan/10 flex items-center justify-center border border-neon-cyan/30 text-neon-cyan">
+                                <i class="fas fa-markdown"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-mono font-bold text-white mb-2">Offline Markdown Rendering</h3>
+                                <p class="text-gray-400 text-sm">Real-time formatting for bold text, headers, lists, blockquotes, and tables. No internet required for rendering.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group p-6 rounded-lg border border-terminal-border hover:border-neon-amber/50 transition-all bg-terminal-black/50">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded bg-neon-amber/10 flex items-center justify-center border border-neon-amber/30 text-neon-amber">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-mono font-bold text-white mb-2">Code Capabilities</h3>
+                                <p class="text-gray-400 text-sm">Syntax highlighting for Python, JavaScript, JSON, and Bash. One-click copy buttons preserve proper indentation.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group p-6 rounded-lg border border-terminal-border hover:border-neon-red/50 transition-all bg-terminal-black/50">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-10 h-10 rounded bg-neon-red/10 flex items-center justify-center border border-neon-red/30 text-neon-red">
+                                <i class="fas fa-cubes"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-mono font-bold text-white mb-2">Model Flexibility</h3>
+                                <p class="text-gray-400 text-sm">Native support for any Ollama-compatible model: TinyLLaMA, Gemma, DeepSeek-Coder, Llama 3, and more.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Preview -->
+                <div class="terminal-window rounded-lg overflow-hidden flex flex-col">
+                    <div class="terminal-header px-4 py-2 flex items-center justify-between">
+                        <span class="font-mono text-xs text-gray-500">example.py</span>
+                        <div class="flex space-x-2">
+                            <button class="text-xs text-gray-600 hover:text-white"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-6 font-mono text-sm overflow-x-auto bg-black/80">
+                        <div class="text-gray-500 mb-2"># Pull and run any Ollama model</div>
+                        <div class="mb-4">
+                            <span class="text-neon-green">$</span> 
+                            <span class="text-white">ollama run deepseek-coder</span>
+                        </div>
+                        
+                        <div class="text-gray-500 mb-2"># Python integration example</div>
+                        <div class="space-y-1">
+                            <div><span class="text-purple-400">import</span> <span class="text-neon-cyan">pyllamaui</span></div>
+                            <div>&nbsp;</div>
+                            <div><span class="text-gray-400"># Initialize client</span></div>
+                            <div>client = pyllamaui.<span class="text-neon-amber">Client</span>(</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;model=<span class="text-neon-green">"llama3"</span>,</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;offline=<span class="text-neon-cyan">True</span></div>
+                            <div>)</div>
+                            <div>&nbsp;</div>
+                            <div><span class="text-gray-400"># Stream response</span></div>
+                            <div><span class="text-purple-400">for</span> chunk <span class="text-purple-400">in</span> client.chat(</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-neon-green">"Explain quantum computing"</span></div>
+                            <div>):</div>
+                            <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-neon-amber">print</span>(chunk, end=<span class="text-neon-green">""</span>)</div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 bg-neon-green/5 border border-neon-green/20 rounded">
+                            <div class="text-neon-green text-xs mb-1">OUTPUT:</div>
+                            <div class="text-gray-300 text-xs leading-relaxed">
+                                Quantum computing leverages quantum mechanical phenomena like superposition and entanglement to perform calculations...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Installation Section -->
+    <section id="install" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-4 mb-12">
+                <span class="font-mono text-neon-amber text-sm">[03]</span>
+                <h2 class="text-3xl font-bold font-mono text-white">Installation Guide</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-terminal-border to-transparent"></div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-12">
+                <!-- Prerequisites -->
+                <div class="lg:col-span-3 terminal-window rounded-lg p-6 mb-8 border-l-4 border-l-neon-amber">
+                    <h3 class="font-mono text-lg text-white mb-4 flex items-center">
+                        <i class="fas fa-exclamation-triangle text-neon-amber mr-2"></i>
+                        Prerequisites
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-6 font-mono text-sm">
+                        <div class="flex items-center justify-between p-3 bg-black/50 rounded border border-terminal-border">
+                            <span class="text-gray-400">Python</span>
+                            <span class="text-neon-green">>= 3.10</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-black/50 rounded border border-terminal-border">
+                            <span class="text-gray-400">Ollama</span>
+                            <span class="text-neon-cyan">Running Instance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Install Option 1 -->
+                <div class="terminal-window rounded-lg overflow-hidden hover-glow transition-all">
+                    <div class="terminal-header px-4 py-3">
+                        <span class="font-mono text-xs text-neon-green flex items-center">
+                            <i class="fab fa-python mr-2"></i>
+                            PyPI Package
+                        </span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <p class="text-gray-400 text-sm">Direct installation via pip for developers.</p>
+                        <div class="code-block p-4 rounded bg-black/50 font-mono text-sm text-gray-300 overflow-x-auto">
+                            <span class="text-neon-green">pip</span> install pyllamaui
+                        </div>
+                        <div class="text-xs text-gray-500 font-mono">
+                            <i class="fas fa-check-circle text-neon-green mr-1"></i>
+                            Cross-platform support
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Install Option 2 -->
+                <div class="terminal-window rounded-lg overflow-hidden hover-glow transition-all">
+                    <div class="terminal-header px-4 py-3">
+                        <span class="font-mono text-xs text-neon-cyan flex items-center">
+                            <i class="fas fa-code mr-2"></i>
+                            VS Code Extension
+                        </span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <p class="text-gray-400 text-sm">Integrated coding assistant experience.</p>
+                        <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui" target="_blank" 
+                           class="block code-block p-4 rounded bg-black/50 font-mono text-sm text-neon-cyan hover:bg-black/70 transition-colors">
+                            marketplace.visualstudio.com<br>
+                            /items?itemName=<br>
+                            bhuvanesh-m-dev.pyllamaui
+                        </a>
+                        <div class="text-xs text-gray-500 font-mono">
+                            <i class="fas fa-plug text-neon-cyan mr-1"></i>
+                            IDE Integration
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Install Option 3 -->
+                <div class="terminal-window rounded-lg overflow-hidden hover-glow transition-all">
+                    <div class="terminal-header px-4 py-3">
+                        <span class="font-mono text-xs text-neon-amber flex items-center">
+                            <i class="fas fa-box mr-2"></i>
+                            Standalone Binaries
+                        </span>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <p class="text-gray-400 text-sm">Pre-built packages for Windows and Linux.</p>
+                        <div class="space-y-2">
+                            <div class="code-block p-3 rounded bg-black/50 font-mono text-xs text-gray-300 flex justify-between items-center">
+                                <span>.exe <span class="text-gray-500">(Windows)</span></span>
+                                <span class="text-neon-amber text-xs">Testing</span>
+                            </div>
+                            <div class="code-block p-3 rounded bg-black/50 font-mono text-xs text-gray-300 flex justify-between items-center">
+                                <span>.deb <span class="text-gray-500">(Debian/Ubuntu/ZentoraOS)</span></span>
+                                <span class="text-neon-amber text-xs">Testing</span>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 font-mono">
+                            <i class="fas fa-download text-neon-amber mr-1"></i>
+                            GitHub Releases
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start Script -->
+            <div class="terminal-window rounded-lg overflow-hidden">
+                <div class="terminal-header px-4 py-3 flex items-center justify-between">
+                    <span class="font-mono text-xs text-gray-500">quickstart.sh</span>
+                    <button onclick="copyToClipboard(this)" class="text-xs text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                </div>
+                <div class="p-6 font-mono text-sm bg-black/80 overflow-x-auto">
+                    <div class="text-gray-500">#!/bin/bash</div>
+                    <div class="text-gray-500"># PyLlamaUI Quick Installation</div>
+                    <div>&nbsp;</div>
+                    <div><span class="text-neon-green">echo</span> <span class="text-neon-cyan">"Initializing PyLlamaUI setup..."</span></div>
+                    <div>&nbsp;</div>
+                    <div><span class="text-gray-500"># 1. Ensure Ollama is running</span></div>
+                    <div><span class="text-purple-400">if</span> ! command -v ollama &> /dev/null; <span class="text-purple-400">then</span></div>
+                    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-neon-green">echo</span> <span class="text-neon-red">"Error: Ollama not found. Please install first."</span></div>
+                    <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-purple-400">exit</span> 1</div>
+                    <div><span class="text-purple-400">fi</span></div>
+                    <div>&nbsp;</div>
+                    <div><span class="text-gray-500"># 2. Install PyLlamaUI</span></div>
+                    <div>pip install --upgrade pyllamaui</div>
+                    <div>&nbsp;</div>
+                    <div><span class="text-gray-500"># 3. Launch</span></div>
+                    <div>pyllamaui --launch</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Usage Section -->
+    <section id="usage" class="py-20 relative bg-terminal-gray/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-4 mb-12">
+                <span class="font-mono text-neon-red text-sm">[04]</span>
+                <h2 class="text-3xl font-bold font-mono text-white">Usage Workflow</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-terminal-border to-transparent"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-neon-green to-neon-cyan rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative terminal-window rounded-lg p-6 h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-2xl text-neon-green font-bold">01</span>
+                            <i class="fas fa-power-off text-neon-green/50"></i>
+                        </div>
+                        <h3 class="font-mono font-bold text-white mb-2">Start Engine</h3>
+                        <p class="text-gray-400 text-sm mb-4">Ensure Ollama background service is running on your machine.</p>
+                        <div class="code-block p-3 rounded text-xs font-mono text-gray-300">
+                            ollama serve
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-neon-cyan to-neon-amber rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative terminal-window rounded-lg p-6 h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-2xl text-neon-cyan font-bold">02</span>
+                            <i class="fas fa-download text-neon-cyan/50"></i>
+                        </div>
+                        <h3 class="font-mono font-bold text-white mb-2">Pull Model</h3>
+                        <p class="text-gray-400 text-sm mb-4">Download your preferred model via terminal.</p>
+                        <div class="code-block p-3 rounded text-xs font-mono text-gray-300 border-l-neon-cyan">
+                            ollama run llama3
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-neon-amber to-neon-red rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                    <div class="relative terminal-window rounded-lg p-6 h-full">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="font-mono text-2xl text-neon-amber font-bold">03</span>
+                            <i class="fas fa-comments text-neon-amber/50"></i>
+                        </div>
+                        <h3 class="font-mono font-bold text-white mb-2">Launch & Chat</h3>
+                        <p class="text-gray-400 text-sm mb-4">Open PyLlamaUI, select model from dropdown, begin secure offline conversation.</p>
+                        <div class="code-block p-3 rounded text-xs font-mono text-gray-300 border-l-neon-amber">
+                            pyllamaui --launch
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS Code Integration Note -->
+            <div class="mt-12 terminal-window rounded-lg p-8 border border-neon-cyan/30">
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 bg-neon-cyan/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-code text-neon-cyan text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-mono font-bold text-white mb-2">VS Code Extension Mode</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                            In the VS Code extension, the chat panel docks neatly alongside your code, allowing you to ask questions, 
+                            generate snippets, and copy formatted code blocks directly into your active files without leaving the IDE.
+                        </p>
+                        <div class="flex items-center space-x-4 text-xs font-mono">
+                            <span class="px-3 py-1 rounded bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30">Offline Mode</span>
+                            <span class="px-3 py-1 rounded bg-neon-green/10 text-neon-green border border-neon-green/30">Syntax Highlight</span>
+                            <span class="px-3 py-1 rounded bg-neon-amber/10 text-neon-amber border border-neon-amber/30">One-Click Copy</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center space-x-4 mb-12">
+                <span class="font-mono text-purple-400 text-sm">[05]</span>
+                <h2 class="text-3xl font-bold font-mono text-white">Roadmap & Future Work</h2>
+                <div class="flex-1 h-px bg-gradient-to-r from-terminal-border to-transparent"></div>
+            </div>
+
+            <div class="terminal-window rounded-lg overflow-hidden">
+                <div class="terminal-header px-6 py-4">
+                    <span class="font-mono text-sm text-gray-400">Development Pipeline // Status: Active</span>
+                </div>
+                
+                <div class="p-8 space-y-8">
+                    <!-- Agentic Mode -->
+                    <div class="flex items-start space-x-6 group">
+                        <div class="flex-shrink-0 w-24 font-mono text-xs text-gray-500 pt-1">MILESTONE_01</div>
+                        <div class="flex-shrink-0 w-3 h-3 rounded-full bg-neon-green status-dot mt-1.5"></div>
+                        <div class="flex-1 pb-8 border-b border-terminal-border group-hover:border-neon-green/50 transition-colors">
+                            <h3 class="font-mono font-bold text-white text-lg mb-2 flex items-center">
+                                Agentic Mode
+                                <span class="ml-3 px-2 py-0.5 rounded text-xs bg-neon-green/10 text-neon-green border border-neon-green/30">In Dev</span>
+                            </h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Introducing autonomous, reasoning-driven workflows natively in PyLlamaUI and its CLI counterpart. 
+                                Self-directed task execution with local model intelligence.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Stabilization -->
+                    <div class="flex items-start space-x-6 group">
+                        <div class="flex-shrink-0 w-24 font-mono text-xs text-gray-500 pt-1">MILESTONE_02</div>
+                        <div class="flex-shrink-0 w-3 h-3 rounded-full bg-neon-amber status-dot mt-1.5"></div>
+                        <div class="flex-1 pb-8 border-b border-terminal-border group-hover:border-neon-amber/50 transition-colors">
+                            <h3 class="font-mono font-bold text-white text-lg mb-2 flex items-center">
+                                Binary Stabilization
+                                <span class="ml-3 px-2 py-0.5 rounded text-xs bg-neon-amber/10 text-neon-amber border border-neon-amber/30">Testing</span>
+                            </h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Moving Windows .exe and Linux .deb packages from testing phases into stable, official releases. 
+                                Enhanced installer validation for ZentoraOS and Debian derivatives.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- UX Enhancements -->
+                    <div class="flex items-start space-x-6 group">
+                        <div class="flex-shrink-0 w-24 font-mono text-xs text-gray-500 pt-1">MILESTONE_03</div>
+                        <div class="flex-shrink-0 w-3 h-3 rounded-full bg-neon-cyan status-dot mt-1.5"></div>
+                        <div class="flex-1">
+                            <h3 class="font-mono font-bold text-white text-lg mb-2 flex items-center">
+                                UX Enhancements
+                                <span class="ml-3 px-2 py-0.5 rounded text-xs bg-neon-cyan/10 text-neon-cyan border border-neon-cyan/30">Planned</span>
+                            </h3>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Continuous improvements to interface smoothness, output formatting, and theme customization. 
+                                Advanced markdown rendering capabilities.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contributing -->
+            <div class="mt-12 grid md:grid-cols-2 gap-8">
+                <div class="terminal-window rounded-lg p-6 border-l-4 border-l-neon-green">
+                    <h3 class="font-mono font-bold text-white mb-4 flex items-center">
+                        <i class="fas fa-code-branch text-neon-green mr-2"></i>
+                        Contributing Guide
+                    </h3>
+                    <p class="text-gray-400 text-sm mb-4">
+                        100% free and open-source. Led by <span class="text-neon-cyan">Bhuvanesh M</span> with testing support from 
+                        <span class="text-gray-300">Mohamed Mohideen Saajid S</span> and <span class="text-gray-300">Mohan Kumar S</span>.
+                    </p>
+                    <div class="space-y-2 font-mono text-xs">
+                        <div class="flex items-center text-gray-500">
+                            <span class="text-neon-green mr-2">$</span>
+                            git clone https://github.com/bhuvanesh-m-dev/pyllamaui.git
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <span class="text-neon-green mr-2">$</span>
+                            git checkout -b feature/amazing-feature
+                        </div>
+                        <div class="flex items-center text-gray-500">
+                            <span class="text-neon-green mr-2">$</span>
+                            git commit -m "Add amazing feature"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="terminal-window rounded-lg p-6 flex flex-col justify-center items-center text-center border-l-4 border-l-neon-cyan">
+                    <i class="fas fa-video text-4xl text-neon-cyan mb-4 animate-pulse"></i>
+                    <h3 class="font-mono font-bold text-white mb-2">Teaser Trailer</h3>
+                    <p class="text-gray-400 text-sm mb-4">
+                        Watch PyLlamaUI running fully offline within VS Code environment.
+                    </p>
+                    <button class="px-6 py-2 bg-neon-cyan/10 border border-neon-cyan/50 text-neon-cyan rounded font-mono text-sm hover:bg-neon-cyan/20 transition-all">
+                        <i class="fas fa-play mr-2"></i>PLAY_DEMO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-terminal-border bg-terminal-black py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-neon-green/10 rounded flex items-center justify-center border border-neon-green/30">
+                        <i class="fas fa-terminal text-neon-green text-sm"></i>
+                    </div>
+                    <span class="font-mono font-bold text-lg">
+                        <span class="text-neon-green">Py</span><span class="text-white">Llama</span><span class="text-neon-cyan">UI</span>
+                    </span>
+                </div>
+                
+                <div class="flex items-center space-x-6 font-mono text-sm text-gray-500">
+                    <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+                    <a href="https://marketplace.visualstudio.com/items?itemName=bhuvanesh-m-dev.pyllamaui" target="_blank" class="hover:text-white transition-colors">VS Code</a>
+                    <a href="https://bhuvaneshm.in/pyllamaui" target="_blank" class="hover:text-white transition-colors">Website</a>
+                    <span class="text-terminal-border">|</span>
+                    <span class="text-neon-green">Offline First</span>
+                </div>
+            </div>
+            
+            <div class="mt-8 pt-8 border-t border-terminal-border text-center font-mono text-xs text-gray-600">
+                <p>Built with <span class="text-neon-red">♥</span> by Bhuvanesh M // Licensed under MIT // Pure On-Device AI</p>
+                <p class="mt-2">System Status: <span class="text-neon-green animate-pulse">●</span> Operational</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        function copyToClipboard(btn) {
+            const code = btn.parentElement.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i>Copied';
+                btn.classList.add('text-neon-green');
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.classList.remove('text-neon-green');
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add glow effect on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-pulse-slow');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card').forEach((el) => observer.observe(el));
+    </script>
+  <img src="https://count.getloli.com/@bhuvanesh-m-dev?name=bhuvanesh-m-dev&theme=ai-1&padding=0&offset=0&align=top&scale=0.1&pixelated=1&darkmode=auto" width="1" height="1" alt="" style="position:absolute;visibility:hidden;" />
+</body>
+</body>
+</html>
