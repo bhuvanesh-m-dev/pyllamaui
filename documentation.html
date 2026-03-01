@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyLlamaUI Documentation</title>
+    <meta name="description" content="PyLlamaUI - Local LLM Interface Documentation">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        black: '#000000',
+                        white: '#ffffff',
+                        gray: {
+                            50: '#fafafa',
+                            100: '#f5f5f5',
+                            200: '#e5e5e5',
+                            300: '#d4d4d4',
+                            400: '#a3a3a3',
+                            500: '#737373',
+                            600: '#525252',
+                            700: '#404040',
+                            800: '#262626',
+                            900: '#171717',
+                            950: '#0a0a0a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafa;
+            --text-primary: #000000;
+            --text-secondary: #525252;
+            --border: #e5e5e5;
+            --accent: #000000;
+        }
+        
+        .dark {
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --text-primary: #ffffff;
+            --text-secondary: #a3a3a3;
+            --border: #262626;
+            --accent: #ffffff;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        .doc-border { border-color: var(--border); }
+        .doc-text-secondary { color: var(--text-secondary); }
+        .doc-bg-secondary { background-color: var(--bg-secondary); }
+        
+        .prose h1 { font-size: 2.25rem; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
+        .prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 3rem; margin-bottom: 1rem; letter-spacing: -0.025em; }
+        .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; }
+        .prose p { margin-bottom: 1.25rem; line-height: 1.75; }
+        .prose ul { margin-bottom: 1.25rem; list-style-type: disc; padding-left: 1.5rem; }
+        .prose ol { margin-bottom: 1.25rem; list-style-type: decimal; padding-left: 1.5rem; }
+        .prose li { margin-bottom: 0.5rem; line-height: 1.75; }
+        .prose code { font-family: monospace; font-size: 0.875rem; padding: 0.125rem 0.375rem; background-color: var(--bg-secondary); border: 1px solid var(--border); border-radius: 0.25rem; }
+        .prose pre { background-color: var(--bg-secondary); border: 1px solid var(--border); padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1.25rem; }
+        .prose pre code { background-color: transparent; border: none; padding: 0; }
+        .prose blockquote { border-left: 2px solid var(--text-primary); padding-left: 1rem; margin-left: 0; margin-bottom: 1.25rem; font-style: italic; }
+        .prose strong { font-weight: 600; }
+        
+        .index-link {
+            display: block;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            border-left: 1px solid transparent;
+            padding-left: 1rem;
+            margin-left: -1px;
+            transition: all 0.2s;
+        }
+        
+        .index-link:hover { color: var(--text-primary); }
+        .index-link.active { color: var(--text-primary); border-left-color: var(--text-primary); font-weight: 500; }
+        .index-link.sub { padding-left: 1.5rem; font-size: 0.8125rem; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
+        
+        .notice-box {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--text-primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 border-b doc-border bg-opacity-95 backdrop-blur" style="background-color: var(--bg-primary);">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="PyLlamaUI Logo" class="h-8 w-8 object-contain">
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight leading-none">PyLlamaUI</h1>
+                    <span class="text-xs doc-text-secondary">Documentation</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <a href="https://github.com/bhuvanesh-m-dev/pyllamaui" target="_blank" class="text-sm hover:underline doc-text-secondary">GitHub</a>
+                <button onclick="toggleTheme()" class="p-2 rounded border doc-border hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors" aria-label="Toggle theme">
+                    <svg id="sun-icon" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="moon-icon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 24.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto pt-16 flex">
+        <!-- Sidebar Index -->
+        <aside class="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] overflow-y-auto border-r doc-border p-6 hidden lg:block doc-bg-secondary">
+            <nav class="space-y-1">
+                <a href="#overview" class="index-link active">Overview</a>
+                <a href="#introduction" class="index-link sub">Introduction</a>
+                <a href="#philosophy" class="index-link sub">Core Philosophy</a>
+                
+                <a href="#features" class="index-link">Features & Capabilities</a>
+                <a href="#chat-ui" class="index-link sub">Interactive Chat</a>
+                <a href="#markdown" class="index-link sub">Markdown Rendering</a>
+                <a href="#code-features" class="index-link sub">Code Capabilities</a>
+                <a href="#models" class="index-link sub">Model Flexibility</a>
+                
+                <a href="#architecture" class="index-link">Architecture</a>
+                <a href="#tech-stack" class="index-link sub">Tech Stack</a>
+                <a href="#backend" class="index-link sub">Backend</a>
+                <a href="#frontend" class="index-link sub">Frontend</a>
+                
+                <a href="#installation" class="index-link">Installation</a>
+                <a href="#pypi-notice" class="index-link sub">PyPI Package</a>
+                <a href="#vscode-install" class="index-link sub">VS Code Extension</a>
+                <a href="#binaries" class="index-link sub">Standalone Binaries</a>
+                
+                <a href="#usage" class="index-link">Usage Guide</a>
+                <a href="#quickstart" class="index-link sub">Quick Start</a>
+                <a href="#workflow" class="index-link sub">Workflow</a>
+                
+                <a href="#configuration" class="index-link">Configuration</a>
+                <a href="#roadmap" class="index-link">Roadmap</a>
+                <a href="#contributing" class="index-link">Contributing</a>
+            </nav>
+            
+            <div class="mt-12 pt-6 border-t doc-border">
+                <p class="text-xs doc-text-secondary mb-2">Version 1.0.0</p>
+                <p class="text-xs doc-text-secondary">Last updated: March 2025</p>
+            </div>
+        </aside>
+
+        <!-- Mobile Index Toggle -->
+        <button onclick="toggleMobileIndex()" class="lg:hidden fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full border doc-border doc-bg-secondary flex items-center justify-center shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <!-- Mobile Index Menu -->
+        <div id="mobile-index" class="lg:hidden fixed inset-0 z-40 hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="toggleMobileIndex()"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-64 doc-bg-secondary border-l doc-border p-6 overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-semibold">Index</h3>
+                    <button onclick="toggleMobileIndex()" class="p-1">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav class="space-y-1">
+                    <a href="#overview" class="index-link" onclick="toggleMobileIndex()">Overview</a>
+                    <a href="#features" class="index-link" onclick="toggleMobileIndex()">Features</a>
+                    <a href="#architecture" class="index-link" onclick="toggleMobileIndex()">Architecture</a>
+                    <a href="#installation" class="index-link" onclick="toggleMobileIndex()">Installation</a>
+                    <a href="#usage" class="index-link" onclick="toggleMobileIndex()">Usage</a>
+                    <a href="#roadmap" class="index-link" onclick="toggleMobileIndex()">Roadmap</a>
+                    <a href="#contributing" class="index-link" onclick="toggleMobileIndex()">Contributing</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 lg:ml-64">
+            <div class="max-w-3xl mx-auto px-6 py-12 prose">
+                
+                <!-- Overview -->
+                <section id="overview" class="scroll-mt-20">
+                    <div class="flex items-center space-x-4 mb-8">
+                        <img src="https://raw.githubusercontent.com/bhuvanesh-m-dev/pyllamaui/refs/heads/main/PyLlamaUI.png" alt="PyLlamaUI Logo" class="h-16 w-16 object-contain">
+                        <div>
+                            <h1 class="m-0">PyLlamaUI Documentation</h1>
+                        </div>
+                    </div>
+                    
+                    <div id="introduction">
+                        <p>
+                            PyLlamaUI is a lightweight, privacy-focused desktop GUI designed to run and interact with Large Language Models (LLMs) locally. It serves as a bridge between powerful local models and an accessible interface, eliminating the need to rely on the command line or cloud-based services.
+                        </p>
+                    </div>
+
+                    <div id="philosophy">
+                        <h2>Core Philosophy</h2>
+                        <p>
+                            The core philosophy is <strong>pure on-device AI</strong>—ensuring no data collection, no telemetry, and zero internet dependency after the initial setup. Your data never leaves your machine.
+                        </p>
+                        
+                        <blockquote>
+                            Privacy is not a feature; it is the foundation. PyLlamaUI operates entirely offline, ensuring your conversations and data remain strictly local.
+                        </blockquote>
+                    </div>
+                </section>
+
+                <!-- Features -->
+                <section id="features" class="scroll-mt-20">
+                    <h2>Features & Capabilities</h2>
+                    <p>
+                        The application is engineered for a seamless developer experience with several robust features designed to maximize productivity while maintaining complete privacy.
+                    </p>
+
+                    <div id="chat-ui">
+                        <h3>Interactive Chat UI</h3>
+                        <p>
+                            A clean, responsive interface available as a standalone desktop app or directly inside VS Code. The interface docks neatly alongside your code, allowing you to ask questions, generate snippets, and interact with your local models without leaving your development environment.
+                        </p>
+                    </div>
+
+                    <div id="markdown">
+                        <h3>Offline Markdown Rendering</h3>
+                        <p>
+                            Real-time formatting for rich text elements including:
+                        </p>
+                        <ul>
+                            <li>Bold and italic text styling</li>
+                            <li>Headers and hierarchical structure</li>
+                            <li>Ordered and unordered lists</li>
+                            <li>Blockquotes and callouts</li>
+                            <li>Tables and structured data</li>
+                        </ul>
+                        <p>
+                            All rendering happens locally without internet connectivity.
+                        </p>
+                    </div>
+
+                    <div id="code-features">
+                        <h3>Code Capabilities</h3>
+                        <p>
+                            Advanced code handling with syntax highlighting for multiple languages:
+                        </p>
+                        <ul>
+                            <li>Python</li>
+                            <li>JavaScript</li>
+                            <li>JSON</li>
+                            <li>Bash/Shell</li>
+                        </ul>
+                        <p>
+                            Features include one-click copy buttons that preserve proper indentation and formatting when transferring code to your active files.
+                        </p>
+                    </div>
+
+                    <div id="models">
+                        <h3>Model Flexibility</h3>
+                        <p>
+                            Native support for inference with any Ollama-compatible model, including but not limited to:
+                        </p>
+                        <ul>
+                            <li>TinyLLaMA</li>
+                            <li>Google Gemma</li>
+                            <li>DeepSeek-Coder</li>
+                            <li>Meta Llama 3</li>
+                            <li>Mistral</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Architecture -->
+                <section id="architecture" class="scroll-mt-20">
+                    <h2>Architecture & Tech Stack</h2>
+                    <p>
+                        PyLlamaUI is built on a modern, open-source stack designed for low resource overhead and maximum compatibility.
+                    </p>
+
+                    <div id="tech-stack">
+                        <h3>Overview</h3>
+                        <p>
+                            The architecture follows a modular design separating concerns between backend logic, frontend presentation, and AI inference engines.
+                        </p>
+                    </div>
+
+                    <div id="backend">
+                        <h3>Backend</h3>
+                        <p>
+                            <strong>Python 3.10+</strong> handles the core logic and REST API communications. The backend manages model interactions, state management, and serves as the intermediary between the user interface and the Ollama inference engine.
+                        </p>
+                    </div>
+
+                    <div id="frontend">
+                        <h3>Frontend / GUI</h3>
+                        <p>
+                            Two deployment options for the user interface:
+                        </p>
+                        <ul>
+                            <li>
+                                <strong>Desktop Application:</strong> Built using the <code>customtkinter</code> framework for native cross-platform desktop experiences
+                            </li>
+                            <li>
+                                <strong>VS Code Extension:</strong> Utilizes the VS Code Webview API for seamless IDE integration
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div id="ai-engine">
+                        <h3>AI Engine</h3>
+                        <p>
+                            Powered entirely by <strong>Ollama</strong>, which manages the local model pulling and inference execution. Ollama provides a unified interface to various open-source large language models.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Installation -->
+                <section id="installation" class="scroll-mt-20">
+                    <h2>Installation Guide</h2>
+                    <p>
+                        Setting up the environment requires a few prerequisites. Ensure your system meets the requirements before proceeding with installation.
+                    </p>
+
+                    <div id="pypi-notice">
+                        <h3>PyPI Package</h3>
+                        
+                        <div class="notice-box">
+                            <p class="m-0 text-sm">
+                                <strong>Development Notice:</strong> The official Python library is currently under development. Once deployed to PyPI, you will be able to install it using:
+                            </p>
+                        </div>
+                        
+                        <pre><code>pip install pyllamaui</code></pre>
+                        
+                        <p>
+                            For system-wide installation, consider using:
+                        </p>
+                        <pre><code>pip install --user pyllamaui</code></pre>
+                        
+                        <p class="doc-text-secondary text-sm">
+                            Currently, please use the VS Code Extension or Standalone Binaries for installation.
+                        </p>
+                    </div>
+
+                    <div id="vscode-install">
+                        <h3>VS Code Extension</h3>
+                        <p>
+                            Available directly from the Visual Studio Marketplace for an integrated coding assistant experience. Search for <code>PyLlamaUI</code> in the Extensions panel or install via the command line:
+                        </p>
+                        <pre><code>code --install-extension bhuvanesh-m-dev.pyllamaui</code></pre>
+                    </div>
+
+                    <div id="binaries">
+                        <h3>Standalone Binaries</h3>
+                        <p>
+                            Downloadable executables are available via the GitHub releases page:
+                        </p>
+                        <ul>
+                            <li>
+                                <strong>Windows:</strong> <code>.exe</code> installer (Currently in testing phase)
+                            </li>
+                            <li>
+                                <strong>Linux:</strong> <code>.deb</code> packages for Debian/Ubuntu-based systems, including custom distributions like ZentoraOS (Currently in testing phase)
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Usage -->
+                <section id="usage" class="scroll-mt-20">
+                    <h2>Usage Guide</h2>
+                    <p>
+                        Operating the interface requires a simple three-step workflow designed for rapid deployment and minimal configuration.
+                    </p>
+
+                    <div id="quickstart">
+                        <h3>Quick Start</h3>
+                        <ol>
+                            <li>
+                                <strong>Start the Engine:</strong> Ensure the Ollama background service is running on your machine.
+                                <pre><code>ollama serve</code></pre>
+                            </li>
+                            <li>
+                                <strong>Pull a Model:</strong> Use the terminal to download your preferred model.
+                                <pre><code>ollama run llama3</code></pre>
+                            </li>
+                            <li>
+                                <strong>Launch & Chat:</strong> Open PyLlamaUI, select your downloaded model from the integrated dropdown menu, and begin your secure offline conversation.
+                                <pre><code>pyllamaui --launch</code></pre>
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div id="workflow">
+                        <h3>Workflow Integration</h3>
+                        <p>
+                            In VS Code extension mode, the chat panel docks alongside your code editor. This allows you to:
+                        </p>
+                        <ul>
+                            <li>Ask questions about your codebase</li>
+                            <li>Generate code snippets contextually</li>
+                            <li>Copy formatted code blocks directly into active files</li>
+                            <li>Maintain conversation history across sessions</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Configuration -->
+                <section id="configuration" class="scroll-mt-20">
+                    <h2>Settings & Configuration</h2>
+                    <p>
+                        The configuration within PyLlamaUI is designed to be minimal and plug-and-play. No complex configuration files are required for basic operation.
+                    </p>
+
+                    <h3>Available Options</h3>
+                    <ul>
+                        <li>
+                            <strong>Model Selection:</strong> Dynamically switch between active Ollama models via the integrated dropdown selector
+                        </li>
+                        <li>
+                            <strong>Theme Toggle:</strong> Switch between light and dark interface modes for user comfort
+                        </li>
+                        <li>
+                            <strong>Chat History:</strong> Manage standard chat history parameters including conversation persistence and context window size
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Roadmap -->
+                <section id="roadmap" class="scroll-mt-20">
+                    <h2>Roadmap & Future Work</h2>
+                    <p>
+                        The development pipeline is focused on expanding local intelligence capabilities while maintaining the core philosophy of privacy and offline operation.
+                    </p>
+
+                    <h3>Upcoming Milestones</h3>
+                    
+                    <p>
+                        <strong>Agentic Mode</strong> — Introducing autonomous, reasoning-driven workflows natively in PyLlamaUI and its CLI counterpart. This feature will enable self-directed task execution and complex multi-step reasoning without user intervention.
+                    </p>
+
+                    <p>
+                        <strong>Stabilization</strong> — Moving the Windows <code>.exe</code> and Linux <code>.deb</code> packages from their current testing phases into stable, official releases. This includes enhanced installer validation and system integration.
+                    </p>
+
+                    <p>
+                        <strong>PyPI Deployment</strong> — Official release of the Python package to PyPI for <code>pip install pyllamaui</code> support.
+                    </p>
+
+                    <p>
+                        <strong>UX Enhancements</strong> — Continuous improvements to interface smoothness, output formatting, and accessibility features.
+                    </p>
+                </section>
+
+                <!-- Contributing -->
+                <section id="contributing" class="scroll-mt-20">
+                    <h2>Contributing Guide</h2>
+                    <p>
+                        As a 100% free and open-source tool led by <strong>Bhuvanesh M</strong>, with testing and quality assurance supported by <strong>Mohamed Mohideen Saajid S</strong> and <strong>Mohan Kumar S</strong>, community involvement is highly encouraged.
+                    </p>
+
+                    <h3>Contribution Workflow</h3>
+                    <ol>
+                        <li>
+                            Fork the main repository on GitHub:
+                            <pre><code>https://github.com/bhuvanesh-m-dev/pyllamaui</code></pre>
+                        </li>
+                        <li>
+                            Clone your fork locally and create a new feature branch:
+                            <pre><code>git clone https://github.com/your-username/pyllamaui.git
+git checkout -b feature/amazing-feature</code></pre>
+                        </li>
+                        <li>
+                            Commit your updates with descriptive messages:
+                            <pre><code>git commit -m "Add: amazing feature description"</code></pre>
+                        </li>
+                        <li>
+                            Push to your origin branch and submit a Pull Request to the main project:
+                            <pre><code>git push origin feature/amazing-feature</code></pre>
+                        </li>
+                    </ol>
+
+                    <h3>Code Standards</h3>
+                    <p>
+                        All contributions should maintain the existing code style, include appropriate documentation, and ensure compatibility with Python 3.10+ and the customtkinter framework.
+                    </p>
+
+                    <div class="mt-12 pt-8 border-t doc-border">
+                        <p class="text-sm doc-text-secondary">
+                            Documentation licensed under <a href="#" class="underline">CC BY 4.0</a> · Code licensed under <a href="#" class="underline">MIT</a>
+                        </p>
+                        <p class="text-sm doc-text-secondary mt-2">
+                            © 2025-present Bhuvanesh M. All rights reserved.
+                        </p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
+        function toggleMobileIndex() {
+            const mobileIndex = document.getElementById('mobile-index');
+            mobileIndex.classList.toggle('hidden');
+        }
+
+        const sections = document.querySelectorAll('section[id], div[id]');
+        const indexLinks = document.querySelectorAll('.index-link');
+
+        function updateActiveIndex() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            indexLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveIndex);
+        window.addEventListener('load', updateActiveIndex);
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+  <img src="https://count.getloli.com/@bhuvanesh-m-dev?name=bhuvanesh-m-dev&theme=ai-1&padding=0&offset=0&align=top&scale=0.1&pixelated=1&darkmode=auto" width="1" height="1" alt="" style="position:absolute;visibility:hidden;" />
+</body>
+</body>
+</html>
